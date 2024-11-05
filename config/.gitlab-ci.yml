@@ -26,6 +26,7 @@ install_frontend:
     paths:
       - trinity/node_modules
   only:
+    - feature/docker-configuration
     - main
     - dev
 
@@ -39,6 +40,7 @@ install_backend:
     paths:
       - app/node_modules
   only:
+    - feature/docker-configuration
     - main
     - dev
 
@@ -52,6 +54,7 @@ build_frontend:
     paths:
       - trinity/build
   only:
+    - feature/docker-configuration
     - main
     - dev
 
@@ -72,6 +75,7 @@ test_backend:
     - cd app
     - npm test
   only:
+    - feature/docker-configuration
     - main
     - dev
 
@@ -81,6 +85,7 @@ test_simple:
   script:
     - echo "Hello, GitLab Runner!"
   only:
+    - feature/docker-configuration
     - main
     - dev
 
@@ -91,6 +96,7 @@ deploy_dev:
     - echo "Déploiement sur l'environnement de développement"
     - docker-compose -f config/docker-compose.dev.yml up --build -d
   only:
+    - feature/docker-configuration
     - dev
 
 # Étape de déploiement pour l'environnement de production
@@ -100,5 +106,6 @@ deploy_prod:
     - echo "Déploiement sur l'environnement de production"
     - docker-compose -f config/docker-compose.prod.yml up --build -d
   only:
+    - feature/docker-configuration
     - main
   when: manual  # Optionnel, pour le déploiement manuel en production
