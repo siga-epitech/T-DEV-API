@@ -2,8 +2,8 @@
 services:
   frontend:
     build:
-      context: ../trinity
-      dockerfile: ../Dockerfile.prod
+      context: ./trinity
+      dockerfile: ./Dockerfile.prod
     ports:
       - "80:80"
     environment:
@@ -11,8 +11,8 @@ services:
 
   backend:
     build:
-      context: ../app
-      dockerfile: ../Dockerfile.prod
+      context: ./app
+      dockerfile: ./Dockerfile.prod
     ports:
       - "5000:5000"
     environment:

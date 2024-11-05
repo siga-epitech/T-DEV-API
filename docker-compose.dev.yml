@@ -2,24 +2,24 @@
 services:
   frontend:
     build:
-      context: ../trinity
-      dockerfile: ../Dockerfile.dev
+      context: ./trinity
+      dockerfile: ./Dockerfile.dev
     ports:
       - "3000:3000"
     volumes:
-      - ../trinity:/app
+      - ./trinity:/app
       - /app/node_modules
     environment:
       - NODE_ENV=development
 
   backend:
     build:
-      context: ../app
-      dockerfile: ../Dockerfile.dev
+      context: ./app
+      dockerfile: ./Dockerfile.dev
     ports:
       - "5000:5000"
     volumes:
-      - ../app:/usr/src/app
+      - ./app:/usr/src/app
       - /usr/src/app/node_modules
     environment:
       - NODE_ENV=development
