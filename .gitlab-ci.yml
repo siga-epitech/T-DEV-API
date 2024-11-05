@@ -121,4 +121,4 @@ deploy_prod:
   only:
     - feature/docker-configuration
     - main
-  when: manual  # Optionnel, pour le déploiement manuel en production testpushpipeline  
+  when: manual  # Optionnel, pour le déploiement manuel en production   
