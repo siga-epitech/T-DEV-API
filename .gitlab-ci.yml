@@ -17,8 +17,6 @@ default:
 # Étape d'installation des dépendances pour le frontend
 install_frontend:
   stage: install
-  tags:
-    - t-dev-700 
   script:
     - echo "Installing frontend dependencies"
     - cd trinity
