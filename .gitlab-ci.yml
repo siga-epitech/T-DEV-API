@@ -20,8 +20,10 @@ install_frontend:
   tags:
     - t-dev-700 
   script:
+    - echo "Installing frontend dependencies"
     - cd trinity
     - npm install
+    - echo "Frontend dependencies installed"
   artifacts:
     paths:
       - trinity/node_modules
@@ -34,8 +36,10 @@ install_frontend:
 install_backend:
   stage: install
   script:
+    - echo "Installing backend dependencies"
     - cd app
     - npm install
+    - echo "Backend dependencies installed"
   artifacts:
     paths:
       - app/node_modules
@@ -48,8 +52,10 @@ install_backend:
 build_frontend:
   stage: build
   script:
+    - echo "Building frontend"
     - cd trinity
     - npm run build
+    - echo "Frontend built successfully"
   artifacts:
     paths:
       - trinity/build
@@ -62,8 +68,10 @@ build_frontend:
 test_frontend:
   stage: test
   script:
+    - echo "Running frontend tests"
     - cd trinity
     - npm test
+    - echo "Frontend tests completed"
   only:
     - main
     - dev
@@ -72,8 +80,10 @@ test_frontend:
 test_backend:
   stage: test
   script:
+    - echo "Running backend tests"
     - cd app
     - npm test
+    - echo "Backend tests completed"
   only:
     - feature/docker-configuration
     - main
