@@ -17,6 +17,8 @@ default:
 # Étape d'installation des dépendances pour le frontend
 install_frontend:
   stage: install
+  tags:
+    - t-dev-700 
   script:
     - cd trinity
     - npm install
@@ -69,6 +71,15 @@ test_backend:
   script:
     - cd app
     - npm test
+  only:
+    - main
+    - dev
+
+# Étape de test simple pour vérifier le fonctionnement du runner
+test_simple:
+  stage: test
+  script:
+    - echo "Hello, GitLab Runner!"
   only:
     - main
     - dev
