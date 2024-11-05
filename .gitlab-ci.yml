@@ -103,7 +103,7 @@ deploy_dev:
   stage: deploy
   script:
     - echo "Déploiement sur l'environnement de développement"
-    - docker-compose -f config/docker-compose.dev.yml up --build -d
+    - docker-compose -f ./docker-compose.dev.yml up --build -d
   only:
     - feature/docker-configuration
     - dev
@@ -113,7 +113,7 @@ deploy_prod:
   stage: deploy
   script:
     - echo "Déploiement sur l'environnement de production"
-    - docker-compose -f config/docker-compose.prod.yml up --build -d
+    - docker-compose -f ./docker-compose.prod.yml up --build -d
   only:
     - feature/docker-configuration
     - main
