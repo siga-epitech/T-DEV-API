@@ -3,7 +3,7 @@ services:
   frontend:
     build:
       context: ../trinity
-      dockerfile: ../config/Dockerfile.dev
+      dockerfile: ../Dockerfile.dev
     ports:
       - "3000:3000"
     volumes:
@@ -15,7 +15,7 @@ services:
   backend:
     build:
       context: ../app
-      dockerfile: ../config/Dockerfile.dev
+      dockerfile: ../Dockerfile.dev
     ports:
       - "5000:5000"
     volumes:
