@@ -9,6 +9,7 @@ variables:
   NODE_ENV: 'production'
   DOCKER_HOST: "tcp://docker:2375"  # Connexion à Docker-in-Docker
   DOCKER_TLS_CERTDIR: ""  # Désactivation de la sécurité TLS (utile pour Docker-in-Docker dans certains cas)
+  DOCKER_DNS: "8.8.8.8"
 
 # Utilisation des runners Docker
 default:
