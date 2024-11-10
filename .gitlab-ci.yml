@@ -7,18 +7,14 @@ stages:
 # Variables globales
 variables:
   NODE_ENV: 'production'
-  DOCKER_HOST: "tcp://docker:2375"  # Connexion à Docker-in-Docker
-  DOCKER_TLS_CERTDIR: ""  # Désactivation de la sécurité TLS (utile pour Docker-in-Docker dans certains cas)
-  DOCKER_DNS: "8.8.8.8"
+  DOCKER_HOST: "tcp://docker:2375/"
+  DOCKER_TLS_CERTDIR: ""  
 
 # Utilisation des runners Docker
 default:
   image: docker:latest
   services:
-    - name: docker:dind
-      alias: docker
-      command: ["dockerd", "--privileged", "--host=tcp://0.0.0.0:2375"]
-
+    - docker:dind
   before_script:
     - apk add --no-cache npm
     - npm install -g npm@latest
@@ -35,7 +31,6 @@ install_frontend:
     paths:
       - trinity/node_modules
   only:
-    - feature/docker-configuration
     - feature/docker-configuration-siga
     - main
     - dev
@@ -52,7 +47,6 @@ install_backend:
     paths:
       - app/node_modules
   only:
-    - feature/docker-configuration
     - feature/docker-configuration-siga
     - main
     - dev
@@ -69,7 +63,6 @@ build_frontend:
     paths:
       - trinity/build
   only:
-    - feature/docker-configuration
     - feature/docker-configuration-siga
     - main
     - dev
@@ -95,7 +88,6 @@ test_backend:
     - npm test
     - echo "Backend tests completed"
   only:
-    - feature/docker-configuration
     - feature/docker-configuration-siga
     - main
     - dev
@@ -106,7 +98,6 @@ test_simple:
   script:
     - echo "Hello, GitLab Runner!"
   only:
-    - feature/docker-configuration
     - feature/docker-configuration-siga
     - main
     - dev
@@ -118,7 +109,6 @@ deploy_dev:
     - echo "Déploiement sur l'environnement de développement"
     - docker-compose -f ./docker-compose.dev.yml up --build -d
   only:
-    - feature/docker-configuration
     - feature/docker-configuration-siga
     - dev
 
@@ -129,7 +119,6 @@ deploy_prod:
     - echo "Déploiement sur l'environnement de production"
     - docker-compose -f ./docker-compose.prod.yml up --build -d
   only:
-    - feature/docker-configuration
     - feature/docker-configuration-siga
     - main
-  when: manual  # Optionnel, pour le déploiement manuel en production
+  when: manual  # Optionnel, pour le déploiement manuel en production 
