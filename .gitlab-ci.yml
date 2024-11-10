@@ -7,18 +7,18 @@ stages:
 # Variables globales
 variables:
   NODE_ENV: 'production'
-  DOCKER_HOST: "tcp://docker:2375/"
-  DOCKER_TLS_CERTDIR: ""  
+  DOCKER_HOST: "tcp://docker:2375"  # Connexion à Docker-in-Docker
+  DOCKER_TLS_CERTDIR: ""  # Désactivation de la sécurité TLS (utile pour Docker-in-Docker dans certains cas)
 
 # Utilisation des runners Docker
 default:
   image: docker:latest
   services:
-    - docker:dind
+    - name: docker:dind
+      alias: docker  # Définition de l'alias pour dind
   before_script:
     - apk add --no-cache npm
     - npm install -g npm@latest
-  alias: docker   # "alias" ici doit être au même niveau que "services"
 
 # Étape d'installation des dépendances pour le frontend
 install_frontend:
