@@ -106,10 +106,14 @@ test_simple:
 deploy_dev:
   stage: deploy
   script:
-    - echo "Déploiement sur l'environnement de développement"
-    - echo "Attente pour le démarrage du service Docker"
-    - sleep 10 
-    - docker-compose -f ./docker-compose.dev.yml up --build -d
+  - echo "Attente pour le démarrage du service Docker"
+  - |
+    while ! docker info > /dev/null 2>&1; do
+      echo "Docker n'est pas encore prêt, attente..."
+      sleep 5
+    done
+  - docker-compose -f ./docker-compose.dev.yml up --build -d
+
   only:
     - feature/docker-configuration-siga
     - dev
