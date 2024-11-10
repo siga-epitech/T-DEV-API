@@ -14,12 +14,10 @@ variables:
 default:
   image: docker:latest
   services:
-    - name: docker:dind
-      alias: docker  # Alias pour la communication
+    - docker:dind
   before_script:
     - apk add --no-cache npm
     - npm install -g npm@latest
-  privileges: true  # Active le mode privilégié pour Docker-in-Docker
 
 # Étape d'installation des dépendances pour le frontend
 install_frontend:
@@ -123,4 +121,4 @@ deploy_prod:
   only:
     - feature/docker-configuration
     - main
-  when: manual  # Optionnel, pour le déploiement manuel en production
+  when: manual  # Optionnel, pour le déploiement manuel en production  
