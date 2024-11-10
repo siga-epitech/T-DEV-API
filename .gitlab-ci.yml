@@ -13,9 +13,9 @@ variables:
 # Utilisation des runners Docker
 default:
   image: docker:latest
-  sservices:
+  services:
   - name: docker:dind
-    entrypoint: ["--privileged"]
+    command: ["--privileged"]
   before_script:
     - apk add --no-cache npm
     - npm install -g npm@latest
