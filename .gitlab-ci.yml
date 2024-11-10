@@ -107,6 +107,8 @@ deploy_dev:
   stage: deploy
   script:
     - echo "Déploiement sur l'environnement de développement"
+    - echo "Attente pour le démarrage du service Docker"
+    - sleep 10 
     - docker-compose -f ./docker-compose.dev.yml up --build -d
   only:
     - feature/docker-configuration-siga
