@@ -7,7 +7,7 @@ stages:
 # Variables globales
 variables:
   NODE_ENV: 'production'
-  DOCKER_HOST: "tcp://docker:2375/"
+  DOCKER_HOST: "tcp://localhost:2375"
   DOCKER_TLS_CERTDIR: ""  
 
 # Utilisation des runners Docker
@@ -31,7 +31,7 @@ install_frontend:
     paths:
       - trinity/node_modules
   only:
-    - feature/docker-configuration-siga
+    - feature/docker-configuration
     - main
     - dev
 
@@ -47,7 +47,7 @@ install_backend:
     paths:
       - app/node_modules
   only:
-    - feature/docker-configuration-siga
+    - feature/docker-configuration
     - main
     - dev
 
@@ -63,7 +63,7 @@ build_frontend:
     paths:
       - trinity/build
   only:
-    - feature/docker-configuration-siga
+    - feature/docker-configuration
     - main
     - dev
 
@@ -88,7 +88,7 @@ test_backend:
     - npm test
     - echo "Backend tests completed"
   only:
-    - feature/docker-configuration-siga
+    - feature/docker-configuration
     - main
     - dev
 
@@ -98,7 +98,7 @@ test_simple:
   script:
     - echo "Hello, GitLab Runner!"
   only:
-    - feature/docker-configuration-siga
+    - feature/docker-configuration
     - main
     - dev
 
@@ -106,16 +106,10 @@ test_simple:
 deploy_dev:
   stage: deploy
   script:
-  - echo "Attente pour le démarrage du service Docker"
-  - |
-    while ! docker info > /dev/null 2>&1; do
-      echo "Docker n'est pas encore prêt, attente..."
-      sleep 5
-    done
-  - docker-compose -f ./docker-compose.dev.yml up --build -d
-
+    - echo "Déploiement sur l'environnement de développement"
+    - docker-compose -f ./docker-compose.dev.yml up --build -d
   only:
-    - feature/docker-configuration-siga
+    - feature/docker-configuration
     - dev
 
 # Étape de déploiement pour l'environnement de production
@@ -125,6 +119,6 @@ deploy_prod:
     - echo "Déploiement sur l'environnement de production"
     - docker-compose -f ./docker-compose.prod.yml up --build -d
   only:
-    - feature/docker-configuration-siga
+    - feature/docker-configuration
     - main
-  when: manual  # Optionnel, pour le déploiement manuel en production 
+  when: manual  # Optionnel, pour le déploiement manuel en production  
