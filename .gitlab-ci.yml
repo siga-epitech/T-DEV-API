@@ -15,10 +15,10 @@ default:
   image: docker:latest
   services:
     - docker:dind
-    alias: docker
   before_script:
     - apk add --no-cache npm
     - npm install -g npm@latest
+  alias: docker   # "alias" ici doit être au même niveau que "services"
 
 # Étape d'installation des dépendances pour le frontend
 install_frontend:
@@ -129,4 +129,4 @@ deploy_prod:
     - feature/docker-configuration
     - feature/docker-configuration-siga
     - main
-  when: manual  # Optionnel, pour le déploiement manuel en production  
+  when: manual  # Optionnel, pour le déploiement manuel en production
