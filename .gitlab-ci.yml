@@ -7,20 +7,24 @@ stages:
 # Variables globales
 variables:
   NODE_ENV: 'production'
-  DOCKER_HOST: "tcp://localhost:2375"
-  DOCKER_TLS_CERTDIR: ""  
+  DOCKER_HOST: "tcp://docker:2375"  
+  DOCKER_TLS_CERTDIR: ""            
 
-# Utilisation des runners Docker
+# Configuration par défaut pour les jobs utilisant Docker
 default:
   image: docker:latest
   services:
-    - docker:dind
+    - name: docker:dind
+      command: ["--host=tcp://0.0.0.0:2375"]  # Démarrage de Docker DIND sans TLS sur le port 2375
+      healthcheck:
+        test: ["CMD-SHELL", "docker info || exit 1"]
+        interval: 10s
+        timeout: 10s
+        retries: 5
   before_script:
     - apk add --no-cache npm
     - npm install -g npm@latest
-  volumes:
-    # Montée du socket Docker de l'hôte vers le conteneur pour permettre l'accès à Docker
-    - /var/run/docker.sock:/var/run/docker.sock
+  privileged: true  # Autorisation d'accès root nécessaire pour Docker-in-Docker
 
 # Étape d'installation des dépendances pour le frontend
 install_frontend:
@@ -124,4 +128,4 @@ deploy_prod:
   only:
     - feature/docker-configuration-siga
     - main
-  when: manual  # Optionnel, pour le déploiement manuel en production
+  when: manual  # Déploiement manuel en production
