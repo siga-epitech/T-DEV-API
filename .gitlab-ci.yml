@@ -4,125 +4,131 @@ stages:
   - test
   - deploy
 
+# Variables globales
 variables:
   NODE_ENV: 'production'
-  DOCKER_DRIVER: "overlay2"
-  DOCKER_HOST: "tcp://docker:2375"  # Connexion sans TLS pour débogage
-  DOCKER_TLS_VERIFY: "0"  # Désactivation de TLS pour simplifier la connexion
-  GITLAB_RUNNER_SERVICES_WAIT_FOR_TIMEOUT: 60  # Délai d'attente pour Docker-in-Docker
+  DOCKER_HOST: "tcp://localhost:2375"
+  DOCKER_TLS_CERTDIR: ""  
 
-# Template Docker commun pour les jobs
-.docker_job_template: &docker_job_template
-  image: docker:27.2.0  # Image Docker officielle
+# Utilisation des runners Docker
+default:
+  image: docker:latest
   services:
-    - name: docker:27.2.0-dind  # Service Docker-in-Docker
-      alias: docker
-      privileged: true  # Activation du mode privileged pour permettre l'accès au kernel
-      command: ["--host=tcp://0.0.0.0:2375"]  # Configuration pour utiliser un socket TCP
-
+    - docker:dind
   before_script:
     - echo "Attente du démarrage de Docker-in-Docker..."
     - |
-      while ! docker info > /dev/null 2>&1; do
+      while ! sudo docker info > /dev/null 2>&1; do
         echo "Docker n'est pas prêt, attente de 10 secondes..."
-        sleep 10  # Attente jusqu'à ce que Docker soit prêt
+        sleep 10
       done
     - echo "Docker est prêt."
-  
-    # Vérification de la version de Docker et des conteneurs actifs
+
     - docker version
     - docker ps
-  
+    - apk add --no-cache npm
+    - npm install -g npm@latest
+
+# Étape d'installation des dépendances pour le frontend
 install_frontend:
-  <<: *docker_job_template
   stage: install
   script:
     - echo "Installing frontend dependencies"
     - cd trinity
-    - npm install  # Installation des dépendances du frontend
+    - npm install
     - echo "Frontend dependencies installed"
   artifacts:
     paths:
-      - trinity/node_modules  # Sauvegarde des dépendances frontend
+      - trinity/node_modules
   only:
     - feature/docker-configuration-siga
     - main
     - dev
 
+# Étape d'installation des dépendances pour le backend
 install_backend:
-  <<: *docker_job_template
   stage: install
   script:
     - echo "Installing backend dependencies"
     - cd app
-    - npm install  # Installation des dépendances du backend
+    - npm install
     - echo "Backend dependencies installed"
   artifacts:
     paths:
-      - app/node_modules  # Sauvegarde des dépendances backend
+      - app/node_modules
   only:
     - feature/docker-configuration-siga
     - main
     - dev
 
+# Étape de build du frontend
 build_frontend:
-  <<: *docker_job_template
   stage: build
   script:
     - echo "Building frontend"
     - cd trinity
-    - npm run build  # Construction du frontend
+    - npm run build
     - echo "Frontend built successfully"
   artifacts:
     paths:
-      - trinity/build  # Sauvegarde du répertoire de build frontend
+      - trinity/build
   only:
     - feature/docker-configuration-siga
     - main
     - dev
 
+# Étape de tests pour le frontend
 test_frontend:
-  <<: *docker_job_template
   stage: test
   script:
     - echo "Running frontend tests"
     - cd trinity
-    - npm test  # Tests du frontend
+    - npm test
     - echo "Frontend tests completed"
   only:
     - main
     - dev
 
+# Étape de tests pour le backend
 test_backend:
-  <<: *docker_job_template
   stage: test
   script:
     - echo "Running backend tests"
     - cd app
-    - npm test  # Tests du backend
+    - npm test
     - echo "Backend tests completed"
   only:
     - feature/docker-configuration-siga
     - main
     - dev
 
+# Étape de test simple pour vérifier le fonctionnement du runner
+test_simple:
+  stage: test
+  script:
+    - echo "Hello, GitLab Runner!"
+  only:
+    - feature/docker-configuration-siga
+    - main
+    - dev
+
+# Étape de déploiement pour l'environnement de développement
 deploy_dev:
-  <<: *docker_job_template
   stage: deploy
   script:
     - echo "Déploiement sur l'environnement de développement"
-    - docker-compose -f ./docker-compose.dev.yml up --build -d  # Déploiement avec docker-compose
+    - docker-compose -f ./docker-compose.dev.yml up --build -d
   only:
     - feature/docker-configuration-siga
     - dev
 
+# Étape de déploiement pour l'environnement de production
 deploy_prod:
-  <<: *docker_job_template
   stage: deploy
   script:
     - echo "Déploiement sur l'environnement de production"
-    - docker-compose -f ./docker-compose.prod.yml up --build -d  # Déploiement avec docker-compose
+    - docker-compose -f ./docker-compose.prod.yml up --build -d
   only:
     - feature/docker-configuration-siga
     - main
-  when: manual  # Déploiement manuel pour la production
+  when: manual  # Optionnel, pour le déploiement manuel en production  
