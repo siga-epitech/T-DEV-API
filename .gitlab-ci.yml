@@ -9,7 +9,6 @@ variables:
   NODE_ENV: 'production'
   DOCKER_HOST: "tcp://docker:2375/"
   DOCKER_TLS_CERTDIR: ""
-  TEAMS_WEBHOOK_URL: "https://epitechfr.webhook.office.com/webhookb2/0847c46d-a93b-4c0b-a417-a1c4b63b47c0@901cb4ca-b862-4029-9306-e5cd0f6d9f86/IncomingWebhook/f569423dffab438cbebff4778201e9e2/4b235b50-7405-4659-9db9-ce370427f74f/V2kmSd8pAHLBLSJNpN8F9c6YNrLCnOXkvyiziU3ezVi0w1"
 
 # Utilisation des runners Docker
 default:
@@ -37,13 +36,7 @@ install_frontend:
     - feature/docker-configuration-siga
     - main
     - dev
-  after_script:
-    - |
-      if [ "$CI_JOB_STATUS" != "success" ]; then
-        curl -H "Content-Type: application/json" \
-        -d "{\"text\": \"🚨 Pipeline Failed on job: install_frontend for project $CI_PROJECT_NAME (branch: $CI_COMMIT_REF_NAME)\"}" \
-        $TEAMS_WEBHOOK_URL
-      fi
+
 
 # Étape d'installation des dépendances pour le backend
 install_backend:
@@ -60,13 +53,7 @@ install_backend:
     - feature/docker-configuration-siga
     - main
     - dev
-  after_script:
-    - |
-      if [ "$CI_JOB_STATUS" != "success" ]; then
-        curl -H "Content-Type: application/json" \
-        -d "{\"text\": \"🚨 Pipeline Failed on job: install_backend for project $CI_PROJECT_NAME (branch: $CI_COMMIT_REF_NAME)\"}" \
-        $TEAMS_WEBHOOK_URL
-      fi
+
 
 # Étape de build du frontend
 build_frontend:
@@ -83,13 +70,7 @@ build_frontend:
     - feature/docker-configuration-siga
     - main
     - dev
-  after_script:
-    - |
-      if [ "$CI_JOB_STATUS" != "success" ]; then
-        curl -H "Content-Type: application/json" \
-        -d "{\"text\": \"🚨 Pipeline Failed on job: build_frontend for project $CI_PROJECT_NAME (branch: $CI_COMMIT_REF_NAME)\"}" \
-        $TEAMS_WEBHOOK_URL
-      fi
+
 
 # Étape de tests pour le frontend
 test_frontend:
@@ -102,13 +83,7 @@ test_frontend:
   only:
     - main
     - dev
-  after_script:
-    - |
-      if [ "$CI_JOB_STATUS" != "success" ]; then
-        curl -H "Content-Type: application/json" \
-        -d "{\"text\": \"🚨 Pipeline Failed on job: test_frontend for project $CI_PROJECT_NAME (branch: $CI_COMMIT_REF_NAME)\"}" \
-        $TEAMS_WEBHOOK_URL
-      fi
+
 
 # Étape de tests pour le backend
 test_backend:
@@ -122,13 +97,7 @@ test_backend:
     - feature/docker-configuration-siga
     - main
     - dev
-  after_script:
-    - |
-      if [ "$CI_JOB_STATUS" != "success" ]; then
-        curl -H "Content-Type: application/json" \
-        -d "{\"text\": \"🚨 Pipeline Failed on job: test_backend for project $CI_PROJECT_NAME (branch: $CI_COMMIT_REF_NAME)\"}" \
-        $TEAMS_WEBHOOK_URL
-      fi
+
 
 # Étape de déploiement pour l'environnement de développement
 deploy_dev:
@@ -139,13 +108,7 @@ deploy_dev:
   only:
     - feature/docker-configuration-siga
     - dev
-  after_script:
-    - |
-      if [ "$CI_JOB_STATUS" != "success" ]; then
-        curl -H "Content-Type: application/json" \
-        -d "{\"text\": \"🚨 Pipeline Failed on job: deploy_dev for project $CI_PROJECT_NAME (branch: $CI_COMMIT_REF_NAME)\"}" \
-        $TEAMS_WEBHOOK_URL
-      fi
+
 
 # Étape de déploiement pour l'environnement de production
 deploy_prod:
@@ -157,10 +120,4 @@ deploy_prod:
     - feature/docker-configuration-siga
     - main
   when: manual  # Optionnel, pour le déploiement manuel en production
-  after_script:
-    - |
-      if [ "$CI_JOB_STATUS" != "success" ]; then
-        curl -H "Content-Type: application/json" \
-        -d "{\"text\": \"🚨 Pipeline Failed on job: deploy_prod for project $CI_PROJECT_NAME (branch: $CI_COMMIT_REF_NAME)\"}" \
-        $TEAMS_WEBHOOK_URL
-      fi
+
