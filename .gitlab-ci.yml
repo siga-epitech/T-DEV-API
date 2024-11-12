@@ -26,8 +26,6 @@ install_frontend:
     - echo "Installing frontend dependencies"
     - cd trinity
     - npm install
-    - echo "Forcing failure to test Teams notification"
-    - exit 1
     - echo "Frontend dependencies installed"
   artifacts:
     paths:
