@@ -1,20 +1,19 @@
-# Dockerfile.prod pour le backend
-FROM node:16
+# Utiliser une image Node.js légère
+FROM node:18-alpine
 
-# Dossier de travail
-WORKDIR /app
+# Définir le répertoire de travail
+WORKDIR /usr/src/app
 
-# Copier uniquement les fichiers package.json pour installer les dépendances de production
+# Copier les fichiers de package et installer uniquement les dépendances nécessaires
 COPY package*.json ./
+RUN npm ci --only=production
 
-# Installer uniquement les dépendances de production
-RUN npm install --only=production
-
-# Copier le code source
+# Copier le reste des fichiers du projet
 COPY . .
 
-# Exposer le port
+# Exposer le port utilisé par l'application Node.js
 EXPOSE 5000
 
-# Lancer l'application en mode production
-CMD ["node", "src/index.js"]
+# Lancer l'application
+CMD ["node", "server.js"]
+

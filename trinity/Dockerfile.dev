@@ -1,20 +1,19 @@
-# Dockerfile.dev pour le frontend
-FROM node:16
+# Utiliser une image Node.js légère
+FROM node:18-alpine
 
-# Dossier de travail
+# Définir le répertoire de travail
 WORKDIR /app
 
-# Copier les fichiers package.json pour installer les dépendances
+# Copier le fichier de package et installer les dépendances
 COPY package*.json ./
-
-# Installer les dépendances
 RUN npm install
 
-# Copier le code source
+# Copier le reste des fichiers du projet
 COPY . .
 
-# Exposer le port pour le serveur de développement
+# Exposer le port utilisé par l'application React
 EXPOSE 3000
 
-# Lancer le serveur de développement de React
+# Démarrer l'application en mode développement
 CMD ["npm", "start"]
+

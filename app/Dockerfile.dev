@@ -1,20 +1,20 @@
-# Dockerfile.dev pour le backend
-FROM node:16
+# Utiliser une image Node.js légère
+FROM node:18-alpine
 
-# Dossier de travail
-WORKDIR /app
+# Définir le répertoire de travail
+WORKDIR /usr/src/app
 
-# Copier les fichiers package.json et package-lock.json pour installer les dépendances
+# Copier les fichiers de package et installer les dépendances
 COPY package*.json ./
-
-# Installer les dépendances (inclut les dépendances de dev comme nodemon)
 RUN npm install
 
-# Copier le code source
+# Copier le reste des fichiers du projet
 COPY . .
 
-# Exposer le port
+# Exposer le port utilisé par l'application Node.js
 EXPOSE 5000
 
-# Démarrer le serveur avec nodemon pour rechargement automatique
-CMD ["npx", "nodemon", "src/index.js"]
+# Démarrer l'application avec nodemon pour le développement
+RUN npm install --global nodemon
+CMD ["nodemon", "server.js"]
+

@@ -1,26 +1,20 @@
-# Dockerfile.prod pour le frontend
-FROM node:16
+# Utiliser une image Node.js légère
+FROM node:18-alpine as build
 
-# Dossier de travail
+# Définir le répertoire de travail
 WORKDIR /app
 
-# Copier les fichiers package.json pour installer les dépendances
+# Installer les dépendances et construire l'application
 COPY package*.json ./
-
-# Installer les dépendances
-RUN npm install
-
-# Copier le code source
+RUN npm install --legacy-peer-deps
 COPY . .
-
-# Construire l'application en mode production
 RUN npm run build
 
-# Installer `serve` pour servir les fichiers statiques
-RUN npm install -g serve
+# Utiliser une image NGINX pour servir les fichiers statiques
+FROM nginx:stable-alpine
+COPY --from=build /app/build /usr/share/nginx/html
 
-# Exposer le port pour servir l'application
-EXPOSE 3000
+# Exposer le port NGINX
+EXPOSE 80
 
-# Lancer le serveur statique pour les fichiers construits
-CMD ["serve", "-s", "build", "-l", "3000"]
+# Pas de CMD car NGINX est configuré par défaut
