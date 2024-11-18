@@ -1,0 +1,20 @@
+# Utiliser une image Node.js légère
+FROM node:18-alpine
+
+# Définir le répertoire de travail
+WORKDIR /usr/src/app
+
+# Copier les fichiers de package et installer les dépendances
+COPY package*.json ./
+RUN npm install
+
+# Copier le reste des fichiers du projet
+COPY . .
+
+# Exposer le port utilisé par l'application Node.js
+EXPOSE 5000
+
+# Démarrer l'application avec nodemon pour le développement
+RUN npm install --global nodemon
+CMD ["nodemon", "server.js"]
+
