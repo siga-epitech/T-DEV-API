@@ -21,10 +21,8 @@ default:
 clone_repos:
   stage: clone
   script:
-    # Vérifions que le token est bien défini (ça n'affichera pas le token, juste sa longueur)
-    - echo "Token length = ${#GITLAB_ACCESS_TOKEN}"
-    # Testons d'abord avec un seul repo
-    - git clone https://oauth2:$GITLAB_ACCESS_TOKEN@t-dev.epitest.eu/MAR_18/T-DEV-702-Api.git api
+    - git clone https://oauth2:$API_ACCESS_TOKEN@t-dev.epitest.eu/MAR_18/T-DEV-702-Api.git api
+    - git clone https://oauth2:$MOBILE_ACCESS_TOKEN@t-dev.epitest.eu/MAR_18/T-DEV-703-Mobile.git mobile
   artifacts:
     paths:
       - api/
