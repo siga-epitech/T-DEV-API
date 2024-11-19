@@ -23,8 +23,11 @@ clone_repos:
   script:
     - echo "API_ACCESS_TOKEN length: ${#API_ACCESS_TOKEN}"
     - echo "API_ACCESS_TOKEN starts with glpat-: $(echo $API_ACCESS_TOKEN | grep -c '^glpat-')"
-    - echo "API_ACCESS_TOKEN preview: $(echo $API_ACCESS_TOKEN | cut -c1-5)...$(echo $API_ACCESS_TOKEN | tail -c6)"
-    - git clone https://oauth2:$API_ACCESS_TOKEN@t-dev.epitest.eu/MAR_18/T-DEV-702-Api.git api
+    - echo "Cloning API repository..."
+    - git clone https://oauth2:${API_ACCESS_TOKEN}@t-dev.epitest.eu/MAR_18/T-DEV-702-Api.git api
+    - echo "Cloning Mobile repository..."
+    - git clone https://oauth2:${MOBILE_ACCESS_TOKEN}@t-dev.epitest.eu/MAR_18/T-DEV-702-Mobile.git mobile
+
   artifacts:
     paths:
       - api/
