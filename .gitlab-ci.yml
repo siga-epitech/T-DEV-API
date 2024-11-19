@@ -18,15 +18,33 @@ default:
     - apk add --no-cache git npm
     - npm install -g npm@latest
 
+debug_tokens:
+  stage: debug
+  script:
+    - echo "DEBUG: Verifying API token environment variable"
+    - echo "API_ACCESS_TOKEN length: ${#API_ACCESS_TOKEN}"
+    - echo "API_ACCESS_TOKEN starts with glpat-: $(echo $API_ACCESS_TOKEN | grep -c '^glpat-')"
+    - echo "Token preview (first 6 chars): $(echo $API_ACCESS_TOKEN | cut -c 1-6)"
+
+
 clone_repos:
   stage: clone
   script:
-    - echo "API_ACCESS_TOKEN length: ${#API_ACCESS_TOKEN}"
-    - echo "API_ACCESS_TOKEN starts with glpat-: $(echo $API_ACCESS_TOKEN | grep -c '^glpat-')"
     - echo "Cloning API repository..."
+    - |
+      if [ -z "$API_ACCESS_TOKEN" ]; then
+        echo "ERROR: API_ACCESS_TOKEN is empty. Please check your CI/CD variables."
+        exit 1
+      fi
     - git clone https://oauth2:${API_ACCESS_TOKEN}@t-dev.epitest.eu/MAR_18/T-DEV-702-Api.git api
     - echo "Cloning Mobile repository..."
+    - |
+      if [ -z "$MOBILE_ACCESS_TOKEN" ]; then
+        echo "ERROR: MOBILE_ACCESS_TOKEN is empty. Please check your CI/CD variables."
+        exit 1
+      fi
     - git clone https://oauth2:${MOBILE_ACCESS_TOKEN}@t-dev.epitest.eu/MAR_18/T-DEV-702-Mobile.git mobile
+
 
   artifacts:
     paths:
