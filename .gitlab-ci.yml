@@ -1,121 +1,111 @@
 stages:
+  - clone
   - install
   - build
   - test
   - deploy
 
-# Variables globales
 variables:
   NODE_ENV: 'production'
   DOCKER_HOST: "tcp://docker:2375/"
   DOCKER_TLS_CERTDIR: ""
 
-# Utilisation des runners Docker
 default:
   image: docker:latest
   services:
     - docker:dind
   before_script:
-    - apk add --no-cache npm
+    - apk add --no-cache git npm
     - npm install -g npm@latest
 
-# Étape d'installation des dépendances pour le frontend
-install_frontend:
-  stage: install
+clone_repos:
+  stage: clone
   script:
-    - echo "Installing frontend dependencies"
-    - cd trinity
-    - npm install
-    - echo "Frontend dependencies installed"
+    - git clone https://t-dev.epitest.eu/MAR_18/T-DEV-702-Api.git api
+    - git clone https://t-dev.epitest.eu/MAR_18/T-DEV-703-Mobile.git mobile
   artifacts:
     paths:
-      - trinity/node_modules
+      - api/
+      - mobile/
+
+install_dependencies:
+  stage: install
+  script:
+    - cd trinity && npm install
+    - cd ../api && npm install
+    - cd ../mobile && npm install
+  artifacts:
+    paths:
+      - trinity/node_modules/
+      - api/node_modules/
+      - mobile/node_modules/
   only:
     - feature/docker-configuration-siga
     - main
     - dev
 
-
-# Étape d'installation des dépendances pour le backend
-install_backend:
-  stage: install
-  script:
-    - echo "Installing backend dependencies"
-    - cd app
-    - npm install
-    - echo "Backend dependencies installed"
-  artifacts:
-    paths:
-      - app/node_modules
-  only:
-    - feature/docker-configuration-siga
-    - main
-    - dev
-
-
-# Étape de build du frontend
 build_frontend:
   stage: build
   script:
-    - echo "Building frontend"
     - cd trinity
     - npm run build
-    - echo "Frontend built successfully"
   artifacts:
     paths:
       - trinity/build
+  dependencies:
+    - install_dependencies
   only:
     - feature/docker-configuration-siga
     - main
     - dev
 
+build_api:
+  stage: build
+  script:
+    - cd api
+    - npm run build
+  artifacts:
+    paths:
+      - api/dist
+  dependencies:
+    - install_dependencies
+  only:
+    - feature/docker-configuration-siga
+    - main
+    - dev
 
-# Étape de tests pour le frontend
 test_frontend:
   stage: test
   script:
-    - echo "Running frontend tests"
     - cd trinity
     - npm test
-    - echo "Frontend tests completed"
   only:
     - main
     - dev
 
-
-# Étape de tests pour le backend
 test_backend:
   stage: test
   script:
-    - echo "Running backend tests"
-    - cd app
+    - cd api
     - npm test
-    - echo "Backend tests completed"
   only:
     - feature/docker-configuration-siga
     - main
     - dev
 
-
-# Étape de déploiement pour l'environnement de développement
 deploy_dev:
   stage: deploy
   script:
-    - echo "Déploiement sur l'environnement de développement"
-    - docker-compose -f ./docker-compose.dev.yml up --build -d
+    - docker-compose -f docker-compose.dev.yml up --build -d
   only:
     - feature/docker-configuration-siga
     - dev
 
-
-# Étape de déploiement pour l'environnement de production
 deploy_prod:
   stage: deploy
   script:
-    - echo "Déploiement sur l'environnement de production"
-    - docker-compose -f ./docker-compose.prod.yml up --build -d
+    - docker-compose -f docker-compose.prod.yml up --build -d
   only:
     - feature/docker-configuration-siga
     - main
-  when: manual  # Optionnel, pour le déploiement manuel en production
-
+  when: manual
