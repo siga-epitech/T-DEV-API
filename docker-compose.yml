@@ -1,42 +1,28 @@
-version: '3.8'
-services:
-  frontend:
-    build:
-      context: ../trinity
-      dockerfile: ../config/Dockerfile.dev
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=development
+stages:
+  - build
+  - deploy
 
-  backend:
-    build:
-      context: ../app
-      dockerfile: ../config/Dockerfile.dev
-    ports:
-      - "5000:5000"
-    environment:
-      - NODE_ENV=development
-      - DATABASE_URL=mongodb://database:27017/mydb
+# Variables globales
+variables:
+  DOCKER_REGISTRY: "registry.gitlab.com"
+  IMAGE_TAG: "$CI_COMMIT_REF_NAME"
 
-  database:
-    image: mongo
-    ports:
-      - "27017:27017"
-    volumes:
-      - db_data:/data/db
+# Étape de récupération des images Docker et déploiement via Docker Compose
+deploy_to_dev:
+  stage: deploy
+  script:
+    - echo "Deploying API and Mobile images to Development environment"
+    - docker-compose -f docker-compose.dev.yml pull  # Pull des dernières images
+    - docker-compose -f docker-compose.dev.yml up --build -d  # Lancer les conteneurs dans l'environnement de dev
+  only:
+    - dev
 
-  # database:
-  #   image: postgres:latest
-  #   environment:
-  #     POSTGRES_USER: user
-  #     POSTGRES_PASSWORD: password
-  #     POSTGRES_DB: mydb
-  #   ports:
-  #     - "5432:5432"
-  #   volumes:
-  #     - db_data:/var/lib/postgresql/data
-
-
-volumes:
-  db_data:
+# Déploiement en production (à adapter pour votre cas)
+deploy_to_prod:
+  stage: deploy
+  script:
+    - echo "Deploying API and Mobile images to Production environment"
+    - docker-compose -f docker-compose.prod.yml pull
+    - docker-compose -f docker-compose.prod.yml up --build -d
+  only:
+    - main
