@@ -21,8 +21,8 @@ default:
 clone_repos:
   stage: clone
   script:
-    - git clone https://$GITLAB_ACCESS_TOKEN@t-dev.epitest.eu/MAR_18/T-DEV-702-Api.git api
-    - git clone https://$GITLAB_ACCESS_TOKEN@t-dev.epitest.eu/MAR_18/T-DEV-703-Mobile.git mobile
+    - git clone https://oauth2:$GITLAB_ACCESS_TOKEN@t-dev.epitest.eu/MAR_18/T-DEV-702-Api.git api
+    - git clone https://oauth2:$GITLAB_ACCESS_TOKEN@t-dev.epitest.eu/MAR_18/T-DEV-703-Mobile.git mobile
   artifacts:
     paths:
       - api/
