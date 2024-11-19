@@ -21,15 +21,10 @@ default:
 clone_repos:
   stage: clone
   script:
-    # Vérifiez la longueur du token
-    - echo "Token length = ${#API_ACCESS_TOKEN}"
-    # Vérifiez si le token commence bien par glpat-
-    - echo "Token starts with glpat-: $(echo $API_ACCESS_TOKEN | grep -c '^glpat-')"
-    # Affichez les 5 premiers et derniers caractères du token (sans révéler tout le token)
-    - echo "Token preview: $(echo $API_ACCESS_TOKEN | cut -c1-5)...$(echo $API_ACCESS_TOKEN | tail -c6)"
-    
-    # Essayez de cloner avec des options de debug
-    - git clone -v https://oauth2:$API_ACCESS_TOKEN@t-dev.epitest.eu/MAR_18/T-DEV-702-Api.git api
+    - echo "API_ACCESS_TOKEN length: ${#API_ACCESS_TOKEN}"
+    - echo "API_ACCESS_TOKEN starts with glpat-: $(echo $API_ACCESS_TOKEN | grep -c '^glpat-')"
+    - echo "API_ACCESS_TOKEN preview: $(echo $API_ACCESS_TOKEN | cut -c1-5)...$(echo $API_ACCESS_TOKEN | tail -c6)"
+    - git clone https://oauth2:$API_ACCESS_TOKEN@t-dev.epitest.eu/MAR_18/T-DEV-702-Api.git api
   artifacts:
     paths:
       - api/
