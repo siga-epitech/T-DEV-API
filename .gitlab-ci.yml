@@ -1,8 +1,8 @@
 stages:
-  - clone
+  - trigger_mobile
+  - trigger_api
   - install
   - build
-  - test
   - deploy
 
 variables:
@@ -15,120 +15,102 @@ default:
   services:
     - docker:dind
   before_script:
-    - apk add --no-cache git npm
+    - echo "Installing base dependencies..."
+    - apk add --no-cache npm git
     - npm install -g npm@latest
 
-debug_tokens:
-  stage: debug
-  script:
-    - echo "DEBUG: Verifying API token environment variable"
-    - echo "API_ACCESS_TOKEN length: ${#API_ACCESS_TOKEN}"
-    - echo "API_ACCESS_TOKEN starts with glpat-: $(echo $API_ACCESS_TOKEN | grep -c '^glpat-')"
-    - echo "Token preview (first 6 chars): $(echo $API_ACCESS_TOKEN | cut -c 1-6)"
+trigger_mobile_pipeline:
+  stage: trigger_mobile
+  trigger:
+    project: MAR_18/T-DEV-703-mobile
+    branch: main
+    strategy: depend
+  only:
+    - main
+    - dev
+    - feature/docker-configuration-siga
 
-
-clone_repos:
-  stage: clone
-  script:
-    - echo "Cloning API repository..."
-    - |
-      if [ -z "$API_ACCESS_TOKEN" ]; then
-        echo "ERROR: API_ACCESS_TOKEN is empty. Please check your CI/CD variables."
-        exit 1
-      fi
-    - git clone https://oauth2:${API_ACCESS_TOKEN}@t-dev.epitest.eu/MAR_18/T-DEV-702-Api.git api
-    - echo "Cloning Mobile repository..."
-    - |
-      if [ -z "$MOBILE_ACCESS_TOKEN" ]; then
-        echo "ERROR: MOBILE_ACCESS_TOKEN is empty. Please check your CI/CD variables."
-        exit 1
-      fi
-    - git clone https://oauth2:${MOBILE_ACCESS_TOKEN}@t-dev.epitest.eu/MAR_18/T-DEV-702-Mobile.git mobile
-
-
-  artifacts:
-    paths:
-      - api/
-      - mobile/
+trigger_api_pipeline:
+  stage: trigger_api
+  trigger:
+    project: MAR_18/T-DEV-702-api
+    branch: main
+    strategy: depend
+  only:
+    - main
+    - dev
+    - feature/docker-configuration-siga
 
 install_dependencies:
   stage: install
   script:
-    - cd trinity && npm install
-    - cd ../api && npm install
-    - cd ../mobile && npm install
+    - echo "Starting dependency installation..."
+    - apk add --no-cache curl unzip
+    - echo "Downloading mobile artifacts from project ${MOBILE_PROJECT_ID}..."
+    - 'curl -v --header "PRIVATE-TOKEN: ${ACCESS_TOKEN}" "https://gitlab.com/api/v4/projects/${MOBILE_PROJECT_ID}/jobs/artifacts/feature/ci-config/download?job=build_mobile" -o mobile_artifacts.zip || echo "Failed to download mobile artifacts"'
+    - echo "Extracting mobile artifacts..."
+    - 'unzip -v mobile_artifacts.zip -d mobile/ || echo "Failed to extract mobile artifacts"'
+    - echo "Downloading API artifacts from project ${API_PROJECT_ID}..."
+    - 'curl -v --header "PRIVATE-TOKEN: ${ACCESS_TOKEN}" "https://gitlab.com/api/v4/projects/${API_PROJECT_ID}/jobs/artifacts/feature/ci-config/download?job=build_api" -o api_artifacts.zip || echo "Failed to download API artifacts"'
+    - echo "Extracting API artifacts..."
+    - 'unzip -v api_artifacts.zip -d api/ || echo "Failed to extract API artifacts"'
+    - echo "Showing directory contents:"
+    - ls -la
+    - echo "Installation complete"
   artifacts:
     paths:
-      - trinity/node_modules/
-      - api/node_modules/
-      - mobile/node_modules/
+      - mobile/
+      - api/
   only:
-    - feature/docker-configuration-siga
     - main
     - dev
+    - feature/docker-configuration-siga
 
-build_frontend:
+build:
   stage: build
   script:
-    - cd trinity
-    - npm run build
-  artifacts:
-    paths:
-      - trinity/build
-  dependencies:
-    - install_dependencies
+    - echo "Starting build stage..."
+    - ls -la
+    - echo "Building with docker-compose..."
+    - docker-compose -f docker-compose.yml build
+    - echo "Build completed"
   only:
+    - main
+    - dev
     - feature/docker-configuration-siga
-    - main
-    - dev
-
-build_api:
-  stage: build
-  script:
-    - cd api
-    - npm run build
-  artifacts:
-    paths:
-      - api/dist
-  dependencies:
-    - install_dependencies
-  only:
-    - feature/docker-configuration-siga
-    - main
-    - dev
-
-test_frontend:
-  stage: test
-  script:
-    - cd trinity
-    - npm test
-  only:
-    - main
-    - dev
-
-test_backend:
-  stage: test
-  script:
-    - cd api
-    - npm test
-  only:
-    - feature/docker-configuration-siga
-    - main
-    - dev
 
 deploy_dev:
   stage: deploy
   script:
+    - echo "Starting development deployment..."
+    - ls -la
+    - echo "Deploying with docker-compose..."
     - docker-compose -f docker-compose.dev.yml up --build -d
+    - echo "Development deployment completed"
   only:
-    - feature/docker-configuration-siga
     - dev
+    - feature/docker-configuration-siga
 
 deploy_prod:
   stage: deploy
   script:
+    - echo "Starting production deployment..."
+    - ls -la
+    - echo "Deploying with docker-compose..."
     - docker-compose -f docker-compose.prod.yml up --build -d
+    - echo "Production deployment completed"
   only:
-    - feature/docker-configuration-siga
+    - main
+  when: manual
+
+deploy_prod:
+  stage: deploy
+  script:
+    - echo "Starting production deployment..."
+    - ls -la
+    - echo "Deploying with docker-compose..."
+    - docker-compose -f docker-compose.prod.yml up --build -d
+    - echo "Production deployment completed"
+  only:
     - main
   when: manual
