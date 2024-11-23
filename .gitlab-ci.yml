@@ -18,7 +18,12 @@ build_backend_image:
   image: docker:latest
   script:
     - echo "Building Docker image for Backend"
+    - echo "Listing files to check if 'api' folder exists"
+    - ls -la ./api   # Vérifie le contenu du dossier ./api
+    # Convertir les slashes et forcer le tag en minuscules
     - IMAGE_TAG=$(echo $CI_COMMIT_REF_NAME | sed 's/\//-/g' | tr '[:upper:]' '[:lower:]')
+    # Vérifier si le fichier Dockerfile existe dans le dossier api avant de construire l'image
+    - if [ ! -f "./api/Dockerfile.test" ]; then echo "Dockerfile not found!"; exit 1; fi
     - docker build -t $DOCKER_IMAGE:$IMAGE_TAG ./api
     - docker save -o api_image.tar $DOCKER_IMAGE:$IMAGE_TAG
   artifacts:
@@ -28,6 +33,7 @@ build_backend_image:
     - main
     - dev
     - feature/ci-config
+
 
 test_backend:
   stage: test
