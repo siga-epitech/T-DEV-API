@@ -18,7 +18,7 @@ build_backend_image:
   image: docker:latest
   script:
     - echo "Building Docker image for Backend"
-    - IMAGE_TAG=$(echo $CI_COMMIT_REF_NAME | sed 's/\//-/g')
+    - IMAGE_TAG=$(echo $CI_COMMIT_REF_NAME | sed 's/\//-/g' | tr '[:upper:]' '[:lower:]')
     - docker build -t $DOCKER_IMAGE:$IMAGE_TAG ./api
     - docker save -o api_image.tar $DOCKER_IMAGE:$IMAGE_TAG
   artifacts:
