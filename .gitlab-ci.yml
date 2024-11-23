@@ -7,12 +7,21 @@ variables:
   DOCKER_REGISTRY: "registry.gitlab.com"
   DOCKER_IMAGE: "$DOCKER_REGISTRY/MAR_18/api"  # Nom du projet pour l'API
   IMAGE_TAG: "$CI_COMMIT_REF_NAME"  # Utilisation de la branche ou du commit
+  DOCKER_TLS_CERTDIR: ""  # Désactiver TLS pour simplifier la configuration dind
+  DOCKER_HOST: "tcp://docker:2375"  # Connecter à Docker via TCP
+  DOCKER_DRIVER: "overlay2"
+
+# Service pour Docker-in-Docker
+services:
+  - docker:20.10-dind  # Version compatible de docker-in-docker
 
 # Étape de construction de l'image Docker pour l'API
 build_backend_image:
   stage: build
+  image: docker:latest  # Utiliser l'image Docker officielle pour construire
   script:
     - echo "Building Docker image for Backend"
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $DOCKER_REGISTRY
     - docker build -t $DOCKER_IMAGE:$IMAGE_TAG ./api  # Construire l'image Docker de l'API
     - docker push $DOCKER_IMAGE:$IMAGE_TAG  # Pousser l'image vers GitLab Container Registry
   only:
@@ -23,12 +32,13 @@ build_backend_image:
 # Étape de test pour l'API
 test_backend:
   stage: test
+  image: node:16  # Image Node.js pour exécuter les tests
   script:
     - echo "Running backend tests"
     - cd api
     - npm install
-    - npm test  # Utiliser tes tests backend ici
+    - npm test  # Exécuter vos tests backend
   only:
     - main
     - dev
-    - feature/ci-config # Tester également sur les branches de développement ou de feature
+    - feature/ci-config  # Tester également sur les branches de développement ou de feature
