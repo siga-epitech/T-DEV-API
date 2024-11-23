@@ -11,7 +11,11 @@ variables:
   DOCKER_DRIVER: "overlay2"
 
 services:
-  - docker:20.10-dind
+  - docker:20.10-dind  
+before_script:
+  - echo "Installing base dependencies..."
+  - apk add --no-cache npm git
+  - npm install -g npm@latest
 
 build_backend_image:
   stage: build
