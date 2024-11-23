@@ -4,39 +4,39 @@ stages:
 
 variables:
   DOCKER_REGISTRY: "registry.gitlab.com"
-  DOCKER_IMAGE: "$DOCKER_REGISTRY/MAR_18/api"  
-  IMAGE_TAG: "$CI_COMMIT_REF_NAME"  
-  DOCKER_TLS_CERTDIR: ""  
-  DOCKER_HOST: "tcp://docker:2375"  
+  DOCKER_IMAGE: "$DOCKER_REGISTRY/MAR_18/api"
+  IMAGE_TAG: "$CI_COMMIT_REF_NAME"
+  DOCKER_TLS_CERTDIR: ""
+  DOCKER_HOST: "tcp://docker:2375"
   DOCKER_DRIVER: "overlay2"
 
 services:
-  - docker:20.10-dind  
-  
+  - docker:20.10-dind
+
 build_backend_image:
   stage: build
   image: docker:latest
   script:
     - echo "Building Docker image for Backend"
+    - IMAGE_TAG=$(echo $CI_COMMIT_REF_NAME | sed 's/\//-/g')
     - docker build -t $DOCKER_IMAGE:$IMAGE_TAG ./api
     - docker save -o api_image.tar $DOCKER_IMAGE:$IMAGE_TAG
   artifacts:
     paths:
-      - api_image.tar  
+      - api_image.tar
   only:
     - main
     - dev
     - feature/ci-config
 
-
 test_backend:
   stage: test
-  image: node:18-alpine 
+  image: node:18-alpine
   script:
     - echo "Running backend tests"
     - cd api
     - npm install
-    - npm test  
+    - npm test
   only:
     - main
     - dev
