@@ -18,10 +18,11 @@ build_backend_image:
   image: docker:latest  
   script:
     - echo "SIGA_REGISTRY_USER=$SIGA_REGISTRY_USER"
-    - echo "SIGA_REGISTRY_PASSWORD=$SIGA_REGISTRY_PASSWORD"
+    - echo "SIGA_REGISTRY_PASSWORD=${SIGA_REGISTRY_PASSWORD:0:5}******"  # Masque le mot de passe pour la sécurité
     - echo "DOCKER_REGISTRY=$DOCKER_REGISTRY"
     - echo "Building Docker image for Backend"
-    - docker login -u "$SIGA_REGISTRY_USER" -p "$SIGA_REGISTRY_PASSWORD" $DOCKER_REGISTRY
+    # Connexion Docker en utilisant le mot de passe via stdin (pas interactif)
+    - echo "$SIGA_REGISTRY_PASSWORD" | docker login -u "$SIGA_REGISTRY_USER" --password-stdin $DOCKER_REGISTRY
     - docker build -t $DOCKER_IMAGE:$IMAGE_TAG ./api  
     - docker push $DOCKER_IMAGE:$IMAGE_TAG  
   only:
@@ -40,4 +41,4 @@ test_backend:
   only:
     - main
     - dev
-    - feature/ci-config  
+    - feature/ci-config
