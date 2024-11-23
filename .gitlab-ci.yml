@@ -4,7 +4,7 @@ stages:
 
 variables:
   DOCKER_REGISTRY: "registry.gitlab.com"
-  DOCKER_IMAGE: "$DOCKER_REGISTRY/MAR_18/api"
+  DOCKER_IMAGE: "$DOCKER_REGISTRY/mar_18/api"  #
   IMAGE_TAG: "$CI_COMMIT_REF_NAME"
   DOCKER_TLS_CERTDIR: ""
   DOCKER_HOST: "tcp://docker:2375"
