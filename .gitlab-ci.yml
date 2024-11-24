@@ -41,7 +41,7 @@ install_dependencies:
     - echo "Downloading API artifacts from project ${SIGA_API_PROJECT_ID} on branch feature/ci-config..."
     - |
       curl -v --header "PRIVATE-TOKEN: ${SIGA_API_ACCESS_TOKEN}" \
-           "https://t-dev.epitest.eu/api/v4/projects/${SIGA_API_PROJECT_ID}/jobs/artifacts/feature/ci-config/download?job=build_backend_image" \
+           "https://t-dev.epitest.eu/api/v4/projects/${SIGA_API_PROJECT_ID}/jobs/artifacts/feature%2Fci-config/download?job=build_backend_image" \
            -o api_artifacts.zip || echo "Failed to download API artifacts."
     - echo "Extracting API artifacts..."
     - |
