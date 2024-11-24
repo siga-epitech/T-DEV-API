@@ -37,7 +37,7 @@ install_dependencies:
   stage: install
   script:
     - echo "Starting dependency installation..."
-    # Télécharger les artefacts de l'API
+    # Télécharger les artefacts de l'API retry
     - echo "Downloading API artifacts from project ${SIGA_API_PROJECT_ID} on branch feature/ci-config..."
     - |
       curl -v --header "PRIVATE-TOKEN: ${SIGA_API_ACCESS_TOKEN}" \
