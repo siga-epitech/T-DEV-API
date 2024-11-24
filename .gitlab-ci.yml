@@ -21,24 +21,22 @@ build_backend_image:
   stage: build
   image: docker:latest
   script:
-    - echo "Building Docker image for Backend"   
+    - echo "Building Docker image for Backend"
     - echo "Listing files to check if 'api' folder exists"
-    - ls -la ./api  # Vérifie le contenu du dossier ./api ok ici ?
+    - ls -la ./api  # Vérifie si le dossier ./api existe et liste les fichiers
     - IMAGE_TAG=$(echo $CI_COMMIT_REF_NAME | sed 's/\//-/g' | tr '[:upper:]' '[:lower:]')
     # Vérifier si le fichier Dockerfile.test existe
     - if [ ! -f "./api/Dockerfile.test" ]; then echo "Dockerfile not found!"; exit 1; fi
     # Utiliser l'option -f pour spécifier le fichier Dockerfile.test
     - docker build -f ./api/Dockerfile.test -t $DOCKER_IMAGE:$IMAGE_TAG ./api
-    - docker save -o api_image.zip $DOCKER_IMAGE:$IMAGE_TAG
+    - docker save -o api_image.tar $DOCKER_IMAGE:$IMAGE_TAG  # Sauvegarder l'image Docker en tant que fichier .tar
   artifacts:
     paths:
-      - api_image.zip
+      - api_image.tar  # Utiliser le fichier .tar pour les artefacts
   only:
     - main
     - dev
     - feature/ci-config
-
-
 
 #test_backend:
 #  stage: test
