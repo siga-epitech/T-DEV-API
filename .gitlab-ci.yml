@@ -45,18 +45,21 @@ install_dependencies:
   stage: install
   script:
     - echo "Starting dependency installation..."
-    - apk add --no-cache curl unzip
-    - echo "Downloading mobile artifacts from project ${MOBILE_PROJECT_ID}..."
-    - 'curl -v --header "PRIVATE-TOKEN: ${ACCESS_TOKEN}" "https://gitlab.com/api/v4/projects/${MOBILE_PROJECT_ID}/jobs/artifacts/feature/ci-config/download?job=build_mobile" -o mobile_artifacts.zip || echo "Failed to download mobile artifacts"'
-    - echo "Extracting mobile artifacts..."
-    - 'unzip -v mobile_artifacts.zip -d mobile/ || echo "Failed to extract mobile artifacts"'
-    - echo "Downloading API artifacts from project ${API_PROJECT_ID}..."
-    - 'curl -v --header "PRIVATE-TOKEN: ${ACCESS_TOKEN}" "https://gitlab.com/api/v4/projects/${API_PROJECT_ID}/jobs/artifacts/feature/ci-config/download?job=build_api" -o api_artifacts.zip || echo "Failed to download API artifacts"'
+    # Télécharger les artefacts de l'API
+    - echo "Downloading API artifacts from project ${SIGA_API_PROJECT_ID}..."
+    - 'curl -v --header "PRIVATE-TOKEN: ${SIGA_API_ACCESS_TOKEN}" "https://gitlab.com/api/v4/projects/${SIGA_API_PROJECT_ID}/jobs/artifacts/main/download?job=build_backend_image" -o api_artifacts.zip || echo "Failed to download API artifacts"'
     - echo "Extracting API artifacts..."
     - 'unzip -v api_artifacts.zip -d api/ || echo "Failed to extract API artifacts"'
-    - echo "Showing directory contents:"
-    - ls -la
-    - echo "Installation complete"
+    - ls -la api/
+ 
+    # Télécharger les artefacts de l'application mobile
+    # - echo "Downloading mobile artifacts from project ${CI_MOBILE_PROJECT_ID}..."
+    # - 'curl -v --header "PRIVATE-TOKEN: ${CI_MOBILE_ACCESS_TOKEN}" "https://gitlab.com/api/v4/projects/${CI_MOBILE_PROJECT_ID}/jobs/artifacts/feature/ci-config/download?job=build_mobile" -o mobile_artifacts.zip || echo "Failed to download mobile artifacts"'
+    # - echo "Extracting mobile artifacts..."
+    # - 'unzip -v mobile_artifacts.zip -d mobile/ || echo "Failed to extract mobile artifacts"'
+    # - echo "Checking if the mobile artifact files are present..."
+    # - ls -la mobile/  # Vérifiez les fichiers extraits dans le dossier mobile
+    # - echo "Installation complete"
   artifacts:
     paths:
       - mobile/
@@ -71,6 +74,8 @@ build:
   script:
     - echo "Starting build stage..."
     - ls -la
+    - echo "Waiting for Docker to be ready..."
+    - until docker info; do echo "Waiting for Docker..."; sleep 5; done  # Attente de la disponibilité de Docker
     - echo "Building with docker-compose..."
     - docker-compose -f docker-compose.yml build
     - echo "Build completed"
@@ -90,18 +95,6 @@ deploy_dev:
   only:
     - dev
     - feature/docker-configuration-siga
-
-deploy_prod:
-  stage: deploy
-  script:
-    - echo "Starting production deployment..."
-    - ls -la
-    - echo "Deploying with docker-compose..."
-    - docker-compose -f docker-compose.prod.yml up --build -d
-    - echo "Production deployment completed"
-  only:
-    - main
-  when: manual
 
 deploy_prod:
   stage: deploy
