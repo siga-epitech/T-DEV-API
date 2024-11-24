@@ -41,22 +41,16 @@ install_dependencies:
     - |
       curl -v --header "PRIVATE-TOKEN: ${SIGA_API_ACCESS_TOKEN}" \
            "https://t-dev.epitest.eu/api/v4/projects/${SIGA_API_PROJECT_ID}/jobs/artifacts/feature%2Fci-config/download?job=build_backend_image" \
-           -o api_artifacts.zip || echo "Failed to download API artifacts."
-    - echo "Listing contents of the downloaded ZIP file..."
-    - unzip -l api_artifacts.zip  
+           -o api_artifacts.tar || echo "Failed to download API artifacts."
+    - echo "Listing contents of the downloaded tar file..."
+    - tar -tvf api_artifacts.tar  # Utilisez tar pour lister le contenu du fichier .tar
     - echo "Extracting API artifacts..."
-    - |
-      # Si l'archive contient un fichier api_image.zip, extrayons-le
-      unzip api_artifacts.zip -d api/ || echo "Failed to extract API artifacts."
-      # Vérifier s'il y a un fichier zip interne et extraire
-      if [ -f "api/api_image.zip" ]; then
-        unzip api/api_image.zip -d api/ || echo "Failed to extract internal api_image.zip."
-      fi
+    - tar -xvf api_artifacts.tar -C api/ || echo "Failed to extract API artifacts."
     - echo "Verifying extracted files..."
-    - ls -la api/
+    - ls -la api/  # Vérifier les fichiers extraits dans le répertoire 'api'
   artifacts:
     paths:
-      - api/
+      - api/  # Conserver l'arborescence dans le répertoire 'api/'
   only:
     - main
     - dev
@@ -67,21 +61,21 @@ build:
   stage: build
   script:
     - echo "Starting build stage..."
-    - ls -la  # Lister les fichiers du répertoire
+    - ls -la  # Lister les fichiers dans le répertoire actuel
     - echo "Waiting for Docker to be ready..."
     - until docker info; do echo "Waiting for Docker..."; sleep 5; done
     - echo "Loading the pre-built Docker image..."
-    # Charger l'image Docker à partir du fichier .tar
-    - docker load -i api_image.tar
+    # Charger l'image Docker à partir du fichier .tar extrait
+    - docker load -i api/api_image.tar  # Charger l'image Docker à partir du fichier .tar dans le répertoire 'api'
     - echo "Image loaded successfully."
     - echo "Starting Docker Compose up..."
-    # Utilisation de docker-compose pour démarrer les conteneurs avec l'image chargée
-    - docker-compose -f docker-compose.yml up -d  # Démarre les conteneurs en mode détaché
+    - docker-compose -f docker-compose.yml up -d  # Démarre les conteneurs avec l'image chargée
     - echo "Build completed."
   only:
     - main
     - dev
     - feature/docker-configuration-siga
+
 
 
 deploy_dev:
