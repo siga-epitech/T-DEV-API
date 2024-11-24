@@ -2,8 +2,8 @@ version: '3.8'
 services:
   frontend:
     build:
-      context: ../trinity
-      dockerfile: ../config/Dockerfile.dev
+      context: ./trinity
+      dockerfile: ./config/Dockerfile.dev
     ports:
       - "3000:3000"
     environment:
@@ -11,8 +11,8 @@ services:
 
   backend:
     build:
-      context: ../app
-      dockerfile: ../config/Dockerfile.dev
+      context: ./app
+      dockerfile: ./config/Dockerfile.dev
     ports:
       - "5000:5000"
     environment:
