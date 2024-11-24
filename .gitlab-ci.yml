@@ -1,5 +1,4 @@
 stages:
-#  - trigger_mobile
   - trigger_api
   - install
   - build
@@ -16,26 +15,19 @@ default:
     - docker:dind
   before_script:
     - echo "Installing base dependencies..."
-    - apk add --no-cache npm git
+    - apk add --no-cache npm git curl unzip
     - npm install -g npm@latest
-
-# trigger_mobile_pipeline:
-#  stage: trigger_mobile
-#  trigger:
-#    project: MAR_18/T-DEV-703-mobile
-#    branch: main
-#    strategy: depend
-#  only:
-#    - main
-#    - dev
-#    - feature/docker-configuration-siga
 
 trigger_api_pipeline:
   stage: trigger_api
-  trigger:
-    project: MAR_18/T-DEV-702-api
-    branch: main
-    strategy: depend
+  script:
+    - echo "Triggering API pipeline on branch feature/ci-config..."
+    - |
+      curl -X POST --fail \
+           -F token=${SIGA_API_TRIGGER_TOKEN} \
+           -F ref=feature/ci-config \
+           https://t-dev.epitest.eu/api/v4/projects/${SIGA_API_PROJECT_ID}/trigger/pipeline \
+      || echo "Failed to trigger API pipeline."
   only:
     - main
     - dev
@@ -46,23 +38,18 @@ install_dependencies:
   script:
     - echo "Starting dependency installation..."
     # Télécharger les artefacts de l'API
-    - echo "Downloading API artifacts from project ${SIGA_API_PROJECT_ID}..."
-    - 'curl -v --header "PRIVATE-TOKEN: ${SIGA_API_ACCESS_TOKEN}" "https://gitlab.com/api/v4/projects/${SIGA_API_PROJECT_ID}/jobs/artifacts/main/download?job=build_backend_image" -o api_artifacts.zip || echo "Failed to download API artifacts"'
+    - echo "Downloading API artifacts from project ${SIGA_API_PROJECT_ID} on branch feature/ci-config..."
+    - |
+      curl -v --header "PRIVATE-TOKEN: ${SIGA_API_ACCESS_TOKEN}" \
+           "https://t-dev.epitest.eu/api/v4/projects/${SIGA_API_PROJECT_ID}/jobs/artifacts/feature/ci-config/download?job=build_backend_image" \
+           -o api_artifacts.zip || echo "Failed to download API artifacts."
     - echo "Extracting API artifacts..."
-    - 'unzip -v api_artifacts.zip -d api/ || echo "Failed to extract API artifacts"'
+    - |
+      unzip -v api_artifacts.zip -d api/ || echo "Failed to extract API artifacts."
+    - echo "Verifying extracted files..."
     - ls -la api/
- 
-    # Télécharger les artefacts de l'application mobile
-    # - echo "Downloading mobile artifacts from project ${CI_MOBILE_PROJECT_ID}..."
-    # - 'curl -v --header "PRIVATE-TOKEN: ${CI_MOBILE_ACCESS_TOKEN}" "https://gitlab.com/api/v4/projects/${CI_MOBILE_PROJECT_ID}/jobs/artifacts/feature/ci-config/download?job=build_mobile" -o mobile_artifacts.zip || echo "Failed to download mobile artifacts"'
-    # - echo "Extracting mobile artifacts..."
-    # - 'unzip -v mobile_artifacts.zip -d mobile/ || echo "Failed to extract mobile artifacts"'
-    # - echo "Checking if the mobile artifact files are present..."
-    # - ls -la mobile/  # Vérifiez les fichiers extraits dans le dossier mobile
-    # - echo "Installation complete"
   artifacts:
     paths:
-      - mobile/
       - api/
   only:
     - main
@@ -75,10 +62,10 @@ build:
     - echo "Starting build stage..."
     - ls -la
     - echo "Waiting for Docker to be ready..."
-    - until docker info; do echo "Waiting for Docker..."; sleep 5; done  # Attente de la disponibilité de Docker
+    - until docker info; do echo "Waiting for Docker..."; sleep 5; done
     - echo "Building with docker-compose..."
     - docker-compose -f docker-compose.yml build
-    - echo "Build completed"
+    - echo "Build completed."
   only:
     - main
     - dev
@@ -91,7 +78,7 @@ deploy_dev:
     - ls -la
     - echo "Deploying with docker-compose..."
     - docker-compose -f docker-compose.dev.yml up --build -d
-    - echo "Development deployment completed"
+    - echo "Development deployment completed."
   only:
     - dev
     - feature/docker-configuration-siga
@@ -103,7 +90,7 @@ deploy_prod:
     - ls -la
     - echo "Deploying with docker-compose..."
     - docker-compose -f docker-compose.prod.yml up --build -d
-    - echo "Production deployment completed"
+    - echo "Production deployment completed."
   only:
     - main
   when: manual
