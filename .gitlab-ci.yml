@@ -1,5 +1,5 @@
 stages:
-  - trigger_mobile
+#  - trigger_mobile
   - trigger_api
   - install
   - build
@@ -19,16 +19,16 @@ default:
     - apk add --no-cache npm git
     - npm install -g npm@latest
 
-trigger_mobile_pipeline:
-  stage: trigger_mobile
-  trigger:
-    project: MAR_18/T-DEV-703-mobile
-    branch: main
-    strategy: depend
-  only:
-    - main
-    - dev
-    - feature/docker-configuration-siga
+# trigger_mobile_pipeline:
+#  stage: trigger_mobile
+#  trigger:
+#    project: MAR_18/T-DEV-703-mobile
+#    branch: main
+#    strategy: depend
+#  only:
+#    - main
+#    - dev
+#    - feature/docker-configuration-siga
 
 trigger_api_pipeline:
   stage: trigger_api
