@@ -37,15 +37,21 @@ install_dependencies:
   stage: install
   script:
     - echo "Starting dependency installation..."
-    # Télécharger les artefacts de l'API retry
     - echo "Downloading API artifacts from project ${SIGA_API_PROJECT_ID} on branch feature/ci-config..."
     - |
       curl -v --header "PRIVATE-TOKEN: ${SIGA_API_ACCESS_TOKEN}" \
            "https://t-dev.epitest.eu/api/v4/projects/${SIGA_API_PROJECT_ID}/jobs/artifacts/feature%2Fci-config/download?job=build_backend_image" \
            -o api_artifacts.zip || echo "Failed to download API artifacts."
+    - echo "Listing contents of the downloaded ZIP file..."
+    - unzip -l api_artifacts.zip  
     - echo "Extracting API artifacts..."
     - |
-      unzip -v api_artifacts.zip -d api/ || echo "Failed to extract API artifacts."
+      # Si l'archive contient un fichier api_image.zip, extrayons-le
+      unzip api_artifacts.zip -d api/ || echo "Failed to extract API artifacts."
+      # Vérifier s'il y a un fichier zip interne et extraire
+      if [ -f "api/api_image.zip" ]; then
+        unzip api/api_image.zip -d api/ || echo "Failed to extract internal api_image.zip."
+      fi
     - echo "Verifying extracted files..."
     - ls -la api/
   artifacts:
@@ -55,6 +61,7 @@ install_dependencies:
     - main
     - dev
     - feature/docker-configuration-siga
+
 
 build:
   stage: build
