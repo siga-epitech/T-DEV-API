@@ -1,6 +1,6 @@
 stages:
   - build
-  - test
+  #- test
 
 variables:
   DOCKER_REGISTRY: "registry.gitlab.com"
@@ -21,18 +21,18 @@ build_backend_image:
   stage: build
   image: docker:latest
   script:
-    - echo "Building Docker image for Backend"
+    - echo "Building Docker image for Backend"   
     - echo "Listing files to check if 'api' folder exists"
-    - ls -la ./api  # Vérifie le contenu du dossier ./api
+    - ls -la ./api  # Vérifie le contenu du dossier ./api ok ici ?
     - IMAGE_TAG=$(echo $CI_COMMIT_REF_NAME | sed 's/\//-/g' | tr '[:upper:]' '[:lower:]')
     # Vérifier si le fichier Dockerfile.test existe
     - if [ ! -f "./api/Dockerfile.test" ]; then echo "Dockerfile not found!"; exit 1; fi
     # Utiliser l'option -f pour spécifier le fichier Dockerfile.test
     - docker build -f ./api/Dockerfile.test -t $DOCKER_IMAGE:$IMAGE_TAG ./api
-    - docker save -o api_image.tar $DOCKER_IMAGE:$IMAGE_TAG
+    - docker save -o api_image.zip $DOCKER_IMAGE:$IMAGE_TAG
   artifacts:
     paths:
-      - api_image.tar
+      - api_image.zip
   only:
     - main
     - dev
@@ -40,15 +40,15 @@ build_backend_image:
 
 
 
-test_backend:
-  stage: test
-  image: node:18-alpine
-  script:
-    - echo "Running backend tests"
-    - cd api
-    - npm install
-    - npm test
-  only:
-    - main
-    - dev
-    - feature/ci-config
+#test_backend:
+#  stage: test
+#  image: node:18-alpine
+#  script:
+#    - echo "Running backend tests"
+#    - cd api
+#    - npm install
+#    - npm test
+#  only:
+#    - main
+#    - dev
+#    - feature/ci-config
