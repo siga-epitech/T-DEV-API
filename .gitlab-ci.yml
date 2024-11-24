@@ -67,16 +67,22 @@ build:
   stage: build
   script:
     - echo "Starting build stage..."
-    - ls -la
+    - ls -la  # Lister les fichiers du répertoire
     - echo "Waiting for Docker to be ready..."
     - until docker info; do echo "Waiting for Docker..."; sleep 5; done
-    - echo "Building with docker-compose..."
-    - docker-compose -f docker-compose.yml build
+    - echo "Loading the pre-built Docker image..."
+    # Charger l'image Docker à partir du fichier .tar
+    - docker load -i api_image.tar
+    - echo "Image loaded successfully."
+    - echo "Starting Docker Compose up..."
+    # Utilisation de docker-compose pour démarrer les conteneurs avec l'image chargée
+    - docker-compose -f docker-compose.yml up -d  # Démarre les conteneurs en mode détaché
     - echo "Build completed."
   only:
     - main
     - dev
     - feature/docker-configuration-siga
+
 
 deploy_dev:
   stage: deploy
