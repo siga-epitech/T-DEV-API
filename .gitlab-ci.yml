@@ -36,21 +36,20 @@ trigger_api_pipeline:
 install_dependencies:
   stage: install
   script:
-    - echo "Starting dependency installation..."
-    - echo "Downloading API artifacts from project ${SIGA_API_PROJECT_ID} on branch feature/ci-config..."
+    - echo "Starting dependency, Downloading API artifacts from project ${SIGA_API_PROJECT_ID} on branch feature/ci-config..."
     - |
       curl -v --header "PRIVATE-TOKEN: ${SIGA_API_ACCESS_TOKEN}" \
            "https://t-dev.epitest.eu/api/v4/projects/${SIGA_API_PROJECT_ID}/jobs/artifacts/feature%2Fci-config/download?job=build_backend_image" \
            -o api_artifacts.zip || echo "Failed to download API artifacts."
     - echo "Listing contents of the downloaded zip file..."
-    - unzip -l api_artifacts.zip  # Utiliser unzip pour lister le contenu du fichier .zip
+    - unzip -l api_artifacts.zip 
     - echo "Extracting API artifacts..."
     - unzip api_artifacts.zip -d api/ || echo "Failed to extract API artifacts."
     - echo "Verifying extracted files..."
-    - ls -la api/  # Vérifier les fichiers extraits dans le répertoire 'api'
+    - ls -la api/  
   artifacts:
     paths:
-      - api/  # Conserver l'arborescence dans le répertoire 'api/'
+      - api/  
   only:
     - main
     - dev
@@ -62,15 +61,15 @@ build:
   stage: build
   script:
     - echo "Starting build stage..."
-    - ls -la  # Lister les fichiers dans le répertoire actuel
+    - ls -la  
     - echo "Waiting for Docker to be ready..."
     - until docker info; do echo "Waiting for Docker..."; sleep 5; done
     - echo "Loading the pre-built Docker image..."
     # Charger l'image Docker à partir du fichier .tar extrait
-    - docker load -i api/api_image.tar  # Charger l'image Docker à partir du fichier .tar dans le répertoire 'api'
+    - docker load -i api/api_image.tar 
     - echo "Image loaded successfully."
     - echo "Starting Docker Compose up..."
-    - docker-compose -f docker-compose.yml up -d  # Démarre les conteneurs avec l'image chargée
+    - docker-compose -f docker-compose.yml up -d  
     - echo "Build completed."
   only:
     - main
@@ -82,9 +81,8 @@ build:
 deploy_dev:
   stage: deploy
   script:
-    - echo "Starting development deployment..."
+    - echo "Starting development deployment with docker-compose..."
     - ls -la
-    - echo "Deploying with docker-compose..."
     - docker-compose -f docker-compose.dev.yml up --build -d
     - echo "Development deployment completed."
   only:
@@ -94,7 +92,7 @@ deploy_dev:
 deploy_prod:
   stage: deploy
   script:
-    - echo "Starting production deployment..."
+    - echo "Starting development deployment with docker-compose..."
     - ls -la
     - echo "Deploying with docker-compose..."
     - docker-compose -f docker-compose.prod.yml up --build -d
