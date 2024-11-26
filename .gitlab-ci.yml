@@ -38,6 +38,8 @@ trigger_api_pipeline:
 
 install_dependencies:
   stage: install
+  needs: 
+    - trigger_api_pipeline
   script:
     - echo "Starting dependency, Downloading API artifacts from project ${SIGA_API_PROJECT_ID} on branch feature/ci-config..."
     - |
