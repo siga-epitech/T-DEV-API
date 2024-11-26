@@ -1,9 +1,7 @@
 stages:
   - build
-  #- test
 
 variables:
-  DOCKER_REGISTRY: "$DOCKER_REGISTRY"
   DOCKER_IMAGE: "$DOCKER_REGISTRY/mar_18/api"  
   IMAGE_TAG: "$CI_COMMIT_REF_NAME"
   DOCKER_TLS_CERTDIR: ""
@@ -12,41 +10,44 @@ variables:
 
 services:
   - docker:20.10-dind  
+
 before_script:
   - echo "Installing base dependencies..."
   - apk add --no-cache npm git
   - npm install -g npm@latest
 
-
-
-build_backend_image:
+# Job de build pour l'image de développement
+build_backend_image_dev:
   stage: build
   image: docker:latest
   script:
-    - echo "Building Docker image for Backend"
+    - echo "Building Docker image for Backend - Dev"
     - echo "Listing files to check if 'api' folder exists"
-    - ls -la ./api 
+    - ls -la ./api
     - IMAGE_TAG=$(echo $CI_COMMIT_REF_NAME | sed 's/\//-/g' | tr '[:upper:]' '[:lower:]')
-    - docker build -f ./api/Dockerfile.test -t $DOCKER_IMAGE:$IMAGE_TAG ./api
-    - docker save -o api_image.tar $DOCKER_IMAGE:$IMAGE_TAG  
+    - docker build -f ./api/Dockerfile.dev -t $DOCKER_IMAGE:$IMAGE_TAG-dev ./api
+    - docker save -o api_image_dev.tar $DOCKER_IMAGE:$IMAGE_TAG-dev  
   artifacts:
     paths:
-      - api_image.tar  
+      - api_image_dev.tar  
   only:
-    - main
     - dev
     - feature/ci-config
 
-#test_backend:
-#  stage: test
-#  image: node:18-alpine
-#  script:
-#    - echo "Running backend tests"
-#    - cd api
-#    - npm install
-#    - npm test
-#  only:
-#    - main
-#    - dev
-#    - feature/ci-config
-#reset hard 
+# Job de build pour l'image de production
+build_backend_image_prod:
+  stage: build
+  image: docker:latest
+  script:
+    - echo "Building Docker image for Backend - Prod"
+    - echo "Listing files to check if 'api' folder exists"
+    - ls -la ./api
+    - IMAGE_TAG=$(echo $CI_COMMIT_REF_NAME | sed 's/\//-/g' | tr '[:upper:]' '[:lower:]')
+    - docker build -f ./api/Dockerfile.prod -t $DOCKER_IMAGE:$IMAGE_TAG-prod ./api
+    - docker save -o api_image_prod.tar $DOCKER_IMAGE:$IMAGE_TAG-prod  
+  artifacts:
+    paths:
+      - api_image_prod.tar  
+  only:
+    - prod
+    - feature/ci-config
