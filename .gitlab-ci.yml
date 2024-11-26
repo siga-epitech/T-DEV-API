@@ -23,6 +23,8 @@ default:
 
 trigger_api_pipeline:
   stage: trigger_api
+  tags:
+    - sigaTagRunner 
   script:
     - echo "Triggering API pipeline on branch feature/ci-config..."
     - |
@@ -38,6 +40,8 @@ trigger_api_pipeline:
 
 install_dependencies:
   stage: install
+  tags:
+    - sigaTagRunner  
   needs: 
     - trigger_api_pipeline
   script:
@@ -60,17 +64,17 @@ install_dependencies:
     - dev
     - feature/docker-configuration-siga
 
-
-
 build:
   stage: build
+  tags:
+    - sigaTagRunner  
   script:
     - echo "Starting build stage..."
     - ls -la  
     - echo "Waiting for Docker to be ready..."
     - until docker info; do echo "Waiting for Docker..."; sleep 5; done
     - echo "Loading the pre-built Docker image..."
-    # Charger l'image Docker à partir du fichier .tar extrait, test container try sync
+
     - docker load -i api/api_image.tar 
     - echo "Image loaded successfully."
     - echo "Starting Docker Compose up..."
@@ -81,10 +85,10 @@ build:
     - dev
     - feature/docker-configuration-siga
 
-
-
 deploy_dev:
   stage: deploy
+  tags:
+    - sigaTagRunner 
   script:
     - echo "Starting development deployment with docker-compose..."
     - ls -la
@@ -96,6 +100,8 @@ deploy_dev:
 
 deploy_prod:
   stage: deploy
+  tags:
+    - sigaTagRunner  
   script:
     - echo "Starting development deployment with docker-compose..."
     - ls -la
