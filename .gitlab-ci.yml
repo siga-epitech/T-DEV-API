@@ -3,7 +3,7 @@ stages:
   #- test
 
 variables:
-  DOCKER_REGISTRY: "registry.gitlab.com"
+  DOCKER_REGISTRY: "$DOCKER_REGISTRY"
   DOCKER_IMAGE: "$DOCKER_REGISTRY/mar_18/api"  
   IMAGE_TAG: "$CI_COMMIT_REF_NAME"
   DOCKER_TLS_CERTDIR: ""
@@ -16,6 +16,8 @@ before_script:
   - echo "Installing base dependencies..."
   - apk add --no-cache npm git
   - npm install -g npm@latest
+
+
 
 build_backend_image:
   stage: build
