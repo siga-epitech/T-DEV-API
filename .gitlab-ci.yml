@@ -17,6 +17,9 @@ default:
     - echo "Installing base dependencies..."
     - apk add --no-cache npm git curl unzip
     - npm install -g npm@latest
+    
+    - echo "Starting Docker-in-Docker..."
+    - docker info || (echo "Docker is not ready, aborting." && exit 1)
 
 trigger_api_pipeline:
   stage: trigger_api
