@@ -1,19 +1,11 @@
-# Utiliser une image Node.js légère
-FROM node:18-alpine
+FROM node:16
 
-# Définir le répertoire de travail
 WORKDIR /usr/src/app
 
-# Copier les fichiers de package et installer uniquement les dépendances nécessaires
 COPY package*.json ./
-RUN npm ci --only=production
 
-# Copier le reste des fichiers du projet
+RUN npm install --production
+
 COPY . .
 
-# Exposer le port utilisé par l'application Node.js
-EXPOSE 5000
-
-# Lancer l'application
-CMD ["node", "server.js"]
-
+EXPOSE 3000
