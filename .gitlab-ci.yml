@@ -17,7 +17,7 @@ default:
     - echo "Installing base dependencies..."
     - apk add --no-cache npm git curl unzip
     - npm install -g npm@latest
-    
+
     - echo "Starting Docker-in-Docker..."
     - docker info || (echo "Docker is not ready, aborting." && exit 1)
 
@@ -68,7 +68,7 @@ build:
     - echo "Waiting for Docker to be ready..."
     - until docker info; do echo "Waiting for Docker..."; sleep 5; done
     - echo "Loading the pre-built Docker image..."
-    # Charger l'image Docker à partir du fichier .tar extrait, test container
+    # Charger l'image Docker à partir du fichier .tar extrait, test container try sync
     - docker load -i api/api_image.tar 
     - echo "Image loaded successfully."
     - echo "Starting Docker Compose up..."
