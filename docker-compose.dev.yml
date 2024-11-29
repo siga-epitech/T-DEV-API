@@ -1,29 +1,24 @@
-# version: '3.8'
+version: '3.8'
 services:
-  frontend:
-    build:
-      context: ./trinity
-      dockerfile: ./Dockerfile.dev
+  api:
+    image: t-dev.epitest.eu/mar_18/api:dev  
     ports:
       - "3000:3000"
-    volumes:
-      - ./trinity:/app
-      - /app/node_modules
     environment:
       - NODE_ENV=development
 
-  backend:
-    build:
-      context: ./app
-      dockerfile: ./Dockerfile.dev
-    ports:
-      - "5000:5000"
-    volumes:
-      - ./app:/usr/src/app
-      - /usr/src/app/node_modules
-    environment:
-      - NODE_ENV=development
-      - DATABASE_URL=mongodb://database:27017/mydb
+#  backend:
+#    build:
+#      context: ./app
+#      dockerfile: ./Dockerfile.dev
+#    ports:
+#      - "5000:5000"
+#    volumes:
+#      - ./app:/usr/src/app
+#      - /usr/src/app/node_modules
+#    environment:
+#      - NODE_ENV=development
+#      - DATABASE_URL=mongodb://database:27017/mydb
 
   database:
     image: mongo

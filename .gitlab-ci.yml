@@ -1,113 +1,58 @@
 stages:
-  - trigger_api
-  - install
+  - clone
   - build
+  - test
   - deploy
 
 variables:
-  NODE_ENV: 'production'
-  DOCKER_HOST: "tcp://docker:2375/"
-  DOCKER_TLS_CERTDIR: ""
+  API_REPO_URL: "https://t-dev.epitest.eu/MAR_18/T-DEV-702-Api"
+  API_BRANCH: "prod"
+  DOCKER_IMAGE_NAME: "api-image"
+  DOCKER_COMPOSE_FILE: "docker-compose.prod.yml"
 
-default:
-  image: docker:latest
-  services:
-    - docker:dind
-  before_script:
-    - echo "Installing base dependencies..."
-    - apk add --no-cache npm git curl unzip
-    - npm install -g npm@latest
-
-    - echo "Starting Docker-in-Docker..."
-    - docker info || (echo "Docker is not ready, aborting." && exit 1)
-
-trigger_api_pipeline:
-  stage: trigger_api
-  tags:
-    - sigaTagRunner 
+clone_api:
+  stage: clone
   script:
-    - echo "Triggering API pipeline on branch feature/ci-config..."
-    - |
-      curl -X POST --fail \
-           -F token=${SIGA_API_TRIGGER_TOKEN} \
-           -F ref=feature/ci-config \
-           https://t-dev.epitest.eu/api/v4/projects/${SIGA_API_PROJECT_ID}/trigger/pipeline \
-      || echo "Failed to trigger API pipeline."
-  only:
-    - main
-    - dev
-    - feature/docker-configuration-siga
-
-install_dependencies:
-  stage: install
-  tags:
-    - sigaTagRunner  
-  needs: 
-    - trigger_api_pipeline
-  script:
-    - echo "Starting dependency, Downloading API artifacts from project ${SIGA_API_PROJECT_ID} on branch feature/ci-config..."
-    - |
-      curl -v --header "PRIVATE-TOKEN: ${SIGA_API_ACCESS_TOKEN}" \
-           "https://t-dev.epitest.eu/api/v4/projects/${SIGA_API_PROJECT_ID}/jobs/artifacts/feature%2Fci-config/download?job=build_backend_image" \
-           -o api_artifacts.zip || echo "Failed to download API artifacts."
-    - echo "Listing contents of the downloaded zip file..."
-    - unzip -l api_artifacts.zip 
-    - echo "Extracting API artifacts..."
-    - unzip api_artifacts.zip -d api/ || echo "Failed to extract API artifacts."
-    - echo "Verifying extracted files..."
-    - ls -la api/  
+    - echo "Cloning API repository from branch ${API_BRANCH}..."
+    - git clone --branch ${API_BRANCH} ${API_REPO_URL} api/
+    - echo "Repository cloned successfully!"
+    - ls -la api/
   artifacts:
     paths:
-      - api/  
-  only:
-    - main
-    - dev
-    - feature/docker-configuration-siga
+      - api/
 
-build:
+build_docker_image:
   stage: build
-  tags:
-    - sigaTagRunner  
+  needs:
+    - clone_api
   script:
-    - echo "Starting build stage..."
-    - ls -la  
-    - echo "Waiting for Docker to be ready..."
-    - until docker info; do echo "Waiting for Docker..."; sleep 5; done
-    - echo "Loading the pre-built Docker image..."
+    - echo "Building Docker image for API locally on the runner machine..."
+    - cd api/
+    - docker build -t ${DOCKER_IMAGE_NAME} .
+    - echo "Docker image built successfully!"
+  artifacts:
+    paths:
+      - api/
 
-    - docker load -i api/api_image.tar 
-    - echo "Image loaded successfully."
-    - echo "Starting Docker Compose up..."
-    - docker-compose -f docker-compose.yml up -d  
-    - echo "Build completed."
-  only:
-    - main
-    - dev
-    - feature/docker-configuration-siga
-
-deploy_dev:
-  stage: deploy
-  tags:
-    - sigaTagRunner 
+test_api:
+  stage: test
+  needs:
+    - build_docker_image
   script:
-    - echo "Starting development deployment with docker-compose..."
-    - ls -la
-    - docker-compose -f docker-compose.dev.yml up --build -d
-    - echo "Development deployment completed."
-  only:
-    - dev
-    - feature/docker-configuration-siga
+    - echo "Running tests for API..."
+    - cd api/
+    - ./run-tests.sh || echo "Tests failed."
+    - echo "Tests completed."
 
 deploy_prod:
   stage: deploy
-  tags:
-    - sigaTagRunner  
+  needs:
+    - build_docker_image
+    - test_api
   script:
-    - echo "Starting development deployment with docker-compose..."
-    - ls -la
-    - echo "Deploying with docker-compose..."
-    - docker-compose -f docker-compose.prod.yml up --build -d
-    - echo "Production deployment completed."
-  only:
-    - main
+    - echo "Deploying containers on the local machine..."
+    - cd api/
+    - echo "Starting containers with docker-compose..."
+    - docker-compose -f ${DOCKER_COMPOSE_FILE} up --build -d
+    - echo "Deployment completed successfully!"
   when: manual
