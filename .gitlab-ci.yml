@@ -1,53 +1,17 @@
 stages:
-  - build
+  - trigger_devops
 
-variables:
-  DOCKER_IMAGE: "$DOCKER_REGISTRY/mar_18/api"  
-  IMAGE_TAG: "$CI_COMMIT_REF_NAME"
-  DOCKER_TLS_CERTDIR: ""
-  DOCKER_HOST: "tcp://docker:2375"
-  DOCKER_DRIVER: "overlay2"
-
-services:
-  - docker:20.10-dind  
-
-before_script:
-  - echo "Installing base dependencies..."
-  - apk add --no-cache npm git
-  - npm install -g npm@latest
-
-# Job de build pour l'image de développement
-build_backend_image_dev:
-  stage: build
-  image: docker:latest
+trigger_devops_pipeline:
+  stage: trigger_devops
+  tags:
+    - sigaTagRunner
   script:
-    - echo "Building Docker image for Backend - Dev"
-    - echo "Listing files to check if 'api' folder exists"
-    - ls -la ./api
-    - IMAGE_TAG=$(echo $CI_COMMIT_REF_NAME | sed 's/\//-/g' | tr '[:upper:]' '[:lower:]')
-    - docker build -f ./api/Dockerfile.dev -t $DOCKER_IMAGE:$IMAGE_TAG-dev ./api
-    - docker save -o api_image_dev.tar $DOCKER_IMAGE:$IMAGE_TAG-dev  
-  artifacts:
-    paths:
-      - api_image_dev.tar  
+    - echo "Triggering pipeline in DevOps repository..."
+    - |
+      curl -X POST --fail \
+           -F token=${SIGA_DEVOPS_TRIGGER_TOKEN} \
+           -F ref=prod \  
+           https://t-dev.epitest.eu/api/v4/projects/718/trigger/pipeline \
+      || echo "Failed to trigger DevOps pipeline."
   only:
-    - dev
-    - feature/ci-config
-
-# Job de build pour l'image de production
-build_backend_image_prod:
-  stage: build
-  image: docker:latest
-  script:
-    - echo "Building Docker image for Backend - Prod"
-    - echo "Listing files to check if 'api' folder exists"
-    - ls -la ./api
-    - IMAGE_TAG=$(echo $CI_COMMIT_REF_NAME | sed 's/\//-/g' | tr '[:upper:]' '[:lower:]')
-    - docker build -f ./api/Dockerfile.prod -t $DOCKER_IMAGE:$IMAGE_TAG-prod ./api
-    - docker save -o api_image_prod.tar $DOCKER_IMAGE:$IMAGE_TAG-prod  
-  artifacts:
-    paths:
-      - api_image_prod.tar  
-  only:
-    - prod
     - feature/ci-config
