@@ -11,12 +11,9 @@ test_docker:
   script:
     - echo "Testing Docker access..."
     - docker info
-    - docker run hello-world
+    - docker run -it hello-world bash
     - docker ps -a
     - ls -l /var/run/docker.sock
-    - git clone --branch ${API_BRANCH} ${API_REPO_URL} api/
-    - echo "Repository cloned successfully!"
-    - ls -la api/
   artifacts:
     paths:
       - api/
