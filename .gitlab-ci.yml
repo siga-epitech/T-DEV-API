@@ -1,17 +1,14 @@
 variables:
-  API_REPO_URL: "https://t-dev.epitest.eu/MAR_18/T-DEV-702-Api"
-  API_BRANCH: "prod"
-  DOCKER_IMAGE_NAME: "api-image"
-  DOCKER_COMPOSE_FILE: "docker-compose.prod.yml"
+  API_REPO_URL: "t-dev.epitest.eu/MAR_18/T-DEV-702-Api.git api/"
+  API_BRANCH: "feature/ci-config"
 
 test_docker:
   stage: test
   tags:
     - sigaTagRunner 
   script:
-    - docker run -d --name my-nginx-container nginx
-    - docker ps -a
-    - docker logs my-nginx-container 
-    - ls -l /var/run/docker.sock
+    - git clone --branch ${API_BRANCH} https://anthony.guarneri:${PERSONAL_ACCESS_TOKEN}@${API_REPO_URL}
   only:
     - feature/docker-configuration-siga  
+
+
