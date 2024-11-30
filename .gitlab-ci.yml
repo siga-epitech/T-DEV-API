@@ -13,8 +13,5 @@ test_docker:
     - docker ps -a
     - docker logs my-nginx-container 
     - ls -l /var/run/docker.sock
-  artifacts:
-    paths:
-      - api/
   only:
     - feature/docker-configuration-siga  
