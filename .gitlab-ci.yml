@@ -10,9 +10,10 @@ trigger_devops_pipeline:
     - |
       curl -X POST --fail \
            -F token=${SIGA_DEVOPS_TRIGGER_TOKEN} \
-           -F ref=feature/docker-configuration-siga   \
+           -F ref=feature/docker-configuration-siga   \ 
            https://t-dev.epitest.eu/api/v4/projects/718/trigger/pipeline \
       || echo "Failed to trigger DevOps pipeline."
   only:
     - feature/ci-config
+
 
