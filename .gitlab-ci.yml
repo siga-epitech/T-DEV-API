@@ -1,8 +1,12 @@
 test_docker:
   stage: test
+  tags:
+    - sigaTagRunner 
   script:
     - echo "Testing Docker access..."
     - docker info
     - docker run hello-world
     - docker ps -a
     - ls -l /var/run/docker.sock
+  only:
+    - feature/docker-configuration-siga  
