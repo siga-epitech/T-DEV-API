@@ -1,58 +1,8 @@
-stages:
-  - clone
-  - build
-  - test
-  - deploy
-
-variables:
-  API_REPO_URL: "https://t-dev.epitest.eu/MAR_18/T-DEV-702-Api"
-  API_BRANCH: "prod"
-  DOCKER_IMAGE_NAME: "api-image"
-  DOCKER_COMPOSE_FILE: "docker-compose.prod.yml"
-
-clone_api:
-  stage: clone
-  script:
-    - echo "Cloning API repository from branch ${API_BRANCH}..."
-    - git clone --branch ${API_BRANCH} ${API_REPO_URL} api/
-    - echo "Repository cloned successfully!"
-    - ls -la api/
-  artifacts:
-    paths:
-      - api/
-
-build_docker_image:
-  stage: build
-  needs:
-    - clone_api
-  script:
-    - echo "Building Docker image for API locally on the runner machine..."
-    - cd api/
-    - docker build -t ${DOCKER_IMAGE_NAME} .
-    - echo "Docker image built successfully!"
-  artifacts:
-    paths:
-      - api/
-
-test_api:
+test_docker:
   stage: test
-  needs:
-    - build_docker_image
   script:
-    - echo "Running tests for API..."
-    - cd api/
-    - ./run-tests.sh || echo "Tests failed."
-    - echo "Tests completed."
-
-deploy_prod:
-  stage: deploy
-  needs:
-    - build_docker_image
-    - test_api
-  script:
-    - echo "Deploying containers on the local machine..."
-    - cd api/
-    - echo "Starting containers with docker-compose..."
-    - docker-compose -f ${DOCKER_COMPOSE_FILE} up --build -d
-    - echo "Deployment completed successfully!"
-  when: manual
+    - echo "Testing Docker access..."
+    - docker info
+    - docker run hello-world
+    - docker ps -a
+    - ls -l /var/run/docker.sock
