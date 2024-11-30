@@ -1,3 +1,9 @@
+variables:
+  API_REPO_URL: "https://t-dev.epitest.eu/MAR_18/T-DEV-702-Api"
+  API_BRANCH: "prod"
+  DOCKER_IMAGE_NAME: "api-image"
+  DOCKER_COMPOSE_FILE: "docker-compose.prod.yml"
+
 test_docker:
   stage: test
   tags:
@@ -8,5 +14,11 @@ test_docker:
     - docker run hello-world
     - docker ps -a
     - ls -l /var/run/docker.sock
+    - git clone --branch ${API_BRANCH} ${API_REPO_URL} api/
+    - echo "Repository cloned successfully!"
+    - ls -la api/
+  artifacts:
+    paths:
+      - api/
   only:
     - feature/docker-configuration-siga  
