@@ -9,10 +9,9 @@ test_docker:
   tags:
     - sigaTagRunner 
   script:
-    - echo "Testing Docker access..."
-    - docker info
-    - docker run -it hello-world bash
+    - docker run -d --name my-nginx-container nginx
     - docker ps -a
+    - docker logs my-nginx-container 
     - ls -l /var/run/docker.sock
   artifacts:
     paths:
