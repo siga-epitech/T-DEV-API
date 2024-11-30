@@ -8,6 +8,12 @@ test_docker:
     - sigaTagRunner 
   script:
     - git clone --branch ${API_BRANCH} https://anthony.guarneri:${PERSONAL_ACCESS_TOKEN}@${API_REPO_URL}
+    # Vérification du contenu du répertoire cloné
+    echo "Listing files in the cloned repository:"
+    ls -l api
+    # Vérification de la présence de certains fichiers spécifiques
+    echo "Checking if README.md exists:"
+    ls -l api/README.md
   only:
     - feature/docker-configuration-siga  
 
