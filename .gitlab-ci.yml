@@ -7,13 +7,14 @@ test_docker:
   tags:
     - sigaTagRunner 
   script:
+    - echo "Current working directory:"
+    - pwd  # Affiche le répertoire de travail actuel
+    - echo "Triggering pipeline in DevOps repository..."
     - git clone --branch ${API_BRANCH} https://anthony.guarneri:${PERSONAL_ACCESS_TOKEN}@${API_REPO_URL}
-    # Vérification du contenu du répertoire cloné
-    echo "Listing files in the cloned repository:"
-    ls -l api
-    # Vérification de la présence de certains fichiers spécifiques
-    echo "Checking if README.md exists:"
-    ls -l api/README.md
+    - echo "Listing files in the current directory:"
+    - ls -l  # Affiche les fichiers dans le répertoire actuel
+    - echo "Listing files in the 'api' directory:"
+    - ls -l api  # Vérifie si le répertoire 'api' existe et contient des fichiers
   only:
     - feature/docker-configuration-siga  
 
