@@ -2,30 +2,27 @@ stages:
   - clone
   - build
 
-
 variables:
-  API_REPO_URL: "t-dev.epitest.eu/MAR_18/T-DEV-702-Api.git api/"
+  API_REPO_URL: "https://t-dev.epitest.eu/MAR_18/T-DEV-702-Api.git"
   API_BRANCH: "feature/ci-config"
   DOCKER_IMAGE_NAME: "t-dev-702-api"
-  ENVIRONMENT: "prod" 
+  ENVIRONMENT: "prod"
 
 clone_api:
   stage: clone
   tags:
-    - sigaTagRunner 
+    - sigaTagRunner
   script:
     - echo "Current working directory:"
-    - pwd  
-    - echo "Triggering pipeline in DevOps repository..."
+    - pwd
+    - echo "Cloning the API repository..."
     - git clone --branch ${API_BRANCH} https://anthony.guarneri:${PERSONAL_ACCESS_TOKEN}@${API_REPO_URL}
     - echo "Listing files in the current directory:"
-    - ls -l  
-    - echo "Listing files in the 'api' directory:"
-    - ls -l api   
-    - echo ${ENVIRONMENT}
-  only:
-    - feature/docker-configuration-siga  
-
+    - ls -l
+    - echo "Listing files in the cloned 'api' directory:"
+    - ls -l api/api  # Si le répertoire 'api' est à l'intérieur du répertoire 'api/'
+  rules:
+    - if: '$ENVIRONMENT == "dev"'
 
 build_docker_image_dev:
   stage: build
@@ -35,7 +32,8 @@ build_docker_image_dev:
     - sigaTagRunner
   script:
     - echo "Building Docker image for development..."
-    - docker build -t ${DOCKER_IMAGE_NAME}:dev -f api/Dockerfile.dev api/
+    - cd api/api  # Naviguer vers le bon répertoire
+    - docker build -t ${DOCKER_IMAGE_NAME}:dev -f Dockerfile.dev .
   rules:
     - if: '$ENVIRONMENT == "dev"'
 
@@ -47,7 +45,7 @@ build_docker_image_prod:
     - sigaTagRunner
   script:
     - echo "Building Docker image for production..."
-    - docker build -t ${DOCKER_IMAGE_NAME}:prod -f api/Dockerfile.prod api/
+    - cd api/api  # Naviguer vers le bon répertoire
+    - docker build -t ${DOCKER_IMAGE_NAME}:prod -f Dockerfile.prod .
   rules:
     - if: '$ENVIRONMENT == "prod"'
-
