@@ -1,12 +1,13 @@
 stages:
   - clone
   - build
-  
+
 
 variables:
   API_REPO_URL: "t-dev.epitest.eu/MAR_18/T-DEV-702-Api.git api/"
   API_BRANCH: "feature/ci-config"
   DOCKER_IMAGE_NAME: "t-dev-702-api"
+  ENVIRONMENT: "prod" 
 
 clone_api:
   stage: clone
@@ -21,9 +22,11 @@ clone_api:
     - ls -l  
     - echo "Listing files in the 'api' directory:"
     - ls -l api   
+    - echo ${ENVIRONMENT}
   only:
     - feature/docker-configuration-siga  
-
+  rules:
+    - if: '$ENVIRONMENT == "dev"'
 
 build_docker_image_dev:
   stage: build
@@ -35,8 +38,7 @@ build_docker_image_dev:
     - echo "Building Docker image for development..."
     - cd api/
     - docker build -t ${DOCKER_IMAGE_NAME}:dev -f Dockerfile.dev .
-  rules:
-    - if: '$ENVIRONMENT == "dev"'
+
 
 build_docker_image_prod:
   stage: build
