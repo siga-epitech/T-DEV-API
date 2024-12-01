@@ -21,8 +21,6 @@ clone_api:
     - ls -l
     - echo "Listing files in the cloned 'api' directory:"
     - ls -l api/api  # Si le répertoire 'api' est à l'intérieur du répertoire 'api/'
-  rules:
-    - if: '$ENVIRONMENT == "dev"'
 
 build_docker_image_dev:
   stage: build
