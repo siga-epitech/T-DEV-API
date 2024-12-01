@@ -35,7 +35,7 @@ build_docker_image_dev:
     - sigaTagRunner
   script:
     - echo "Building Docker image for development..."
-    - docker build -t ${DOCKER_IMAGE_NAME}:dev -f Dockerfile.dev .
+    - docker build -t ${DOCKER_IMAGE_NAME}:dev -f api/Dockerfile.dev api/
   rules:
     - if: '$ENVIRONMENT == "dev"'
 
@@ -47,7 +47,7 @@ build_docker_image_prod:
     - sigaTagRunner
   script:
     - echo "Building Docker image for production..."
-    - docker build -t ${DOCKER_IMAGE_NAME}:prod -f Dockerfile.prod .
+    - docker build -t ${DOCKER_IMAGE_NAME}:prod -f api/Dockerfile.prod api/
   rules:
     - if: '$ENVIRONMENT == "prod"'
 
