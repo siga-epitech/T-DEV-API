@@ -23,8 +23,9 @@ clone_api:
     - echo "Listing files in the 'api' directory:"
     - ls -l api   
     - echo ${ENVIRONMENT}
-  rules:
-    - if: '$ENVIRONMENT == "dev"'
+  only:
+    - feature/docker-configuration-siga  
+
 
 build_docker_image_dev:
   stage: build
@@ -36,7 +37,8 @@ build_docker_image_dev:
     - echo "Building Docker image for development..."
     - cd api/
     - docker build -t ${DOCKER_IMAGE_NAME}:dev -f Dockerfile.dev .
-
+  rules:
+    - if: '$ENVIRONMENT == "dev"'
 
 build_docker_image_prod:
   stage: build
