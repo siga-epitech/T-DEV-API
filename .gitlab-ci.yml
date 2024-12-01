@@ -1,6 +1,3 @@
-stages:
-  - trigger_devops
-
 trigger_devops_pipeline:
   stage: trigger_devops
   tags:
@@ -10,7 +7,7 @@ trigger_devops_pipeline:
     - |
       curl -X POST --fail \
            -F token=${SIGA_DEVOPS_TRIGGER_TOKEN} \
-           -F ref=feature/docker-configuration-siga 
+           -F ref=feature/docker-configuration-siga \
            -F "variables[ENVIRONMENT]=dev" \
            https://t-dev.epitest.eu/api/v4/projects/718/trigger/pipeline \
       || echo "Failed to trigger DevOps pipeline."
