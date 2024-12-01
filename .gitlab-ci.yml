@@ -1,3 +1,6 @@
+stages:
+  - trigger_devops
+
 trigger_devops_pipeline:
   stage: trigger_devops
   tags:
@@ -17,3 +20,8 @@ trigger_devops_pipeline:
   
   # Changer aussi la branche de Ref, car en realité on veux que le trigger ici active les jobs de dev donc on trigger les jobs de dev
   # Changer la valeur de 718 (qui est l'id du repos) par une variable d'environnement
+
+
+
+
+
