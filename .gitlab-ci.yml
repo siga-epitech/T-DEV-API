@@ -23,8 +23,6 @@ clone_api:
     - echo "Listing files in the 'api' directory:"
     - ls -l api   
     - echo ${ENVIRONMENT}
-  only:
-    - feature/docker-configuration-siga  
   rules:
     - if: '$ENVIRONMENT == "dev"'
 
