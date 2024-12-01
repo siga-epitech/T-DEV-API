@@ -2,11 +2,12 @@ stages:
   - clone
   - build
 
+
 variables:
-  API_REPO_URL: "https://t-dev.epitest.eu/MAR_18/T-DEV-702-Api.git"
+  API_REPO_URL: "t-dev.epitest.eu/MAR_18/T-DEV-702-Api.git api/"
   API_BRANCH: "feature/ci-config"
   DOCKER_IMAGE_NAME: "t-dev-702-api"
-  ENVIRONMENT: "prod"
+  ENVIRONMENT: "prod" 
 
 clone_api:
   stage: clone
@@ -21,6 +22,7 @@ clone_api:
     - ls -l
     - echo "Listing files in the cloned 'api' directory:"
     - ls -l api/api  # Si le répertoire 'api' est à l'intérieur du répertoire 'api/'
+
 
 build_docker_image_dev:
   stage: build
