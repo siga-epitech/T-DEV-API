@@ -1,21 +1,48 @@
 variables:
   API_REPO_URL: "t-dev.epitest.eu/MAR_18/T-DEV-702-Api.git api/"
   API_BRANCH: "feature/ci-config"
+  DOCKER_IMAGE_NAME: "t-dev-702-api"
 
-test_docker:
+clone_api:
   stage: test
   tags:
     - sigaTagRunner 
   script:
     - echo "Current working directory:"
-    - pwd  # Affiche le répertoire de travail actuel
+    - pwd  
     - echo "Triggering pipeline in DevOps repository..."
     - git clone --branch ${API_BRANCH} https://anthony.guarneri:${PERSONAL_ACCESS_TOKEN}@${API_REPO_URL}
     - echo "Listing files in the current directory:"
-    - ls -l  # Affiche les fichiers dans le répertoire actuel
+    - ls -l  
     - echo "Listing files in the 'api' directory:"
-    - ls -l api  # Vérifie si le répertoire 'api' existe et contient des fichiers
+    - ls -l api   
   only:
     - feature/docker-configuration-siga  
 
+
+build_docker_image_dev:
+  stage: build
+  needs:
+    - clone_api
+  tags:
+    - sigaTagRunner
+  script:
+    - echo "Building Docker image for development..."
+    - cd api/
+    - docker build -t ${DOCKER_IMAGE_NAME}:dev -f Dockerfile.dev .
+  rules:
+    - if: '$ENVIRONMENT == "dev"'
+
+build_docker_image_prod:
+  stage: build
+  needs:
+    - clone_api
+  tags:
+    - sigaTagRunner
+  script:
+    - echo "Building Docker image for production..."
+    - cd api/
+    - docker build -t ${DOCKER_IMAGE_NAME}:prod -f Dockerfile.prod .
+  rules:
+    - if: '$ENVIRONMENT == "prod"'
 
