@@ -1,10 +1,15 @@
+stages:
+  - clone
+  - build
+  
+
 variables:
   API_REPO_URL: "t-dev.epitest.eu/MAR_18/T-DEV-702-Api.git api/"
   API_BRANCH: "feature/ci-config"
   DOCKER_IMAGE_NAME: "t-dev-702-api"
 
 clone_api:
-  stage: test
+  stage: clone
   tags:
     - sigaTagRunner 
   script:
