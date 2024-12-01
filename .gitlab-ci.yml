@@ -44,6 +44,12 @@ build_docker_image_prod:
   tags:
     - sigaTagRunner
   script:
+    - echo "Current working directory:"
+    - pwd
+    - echo "Listing files in the current directory:"
+    - ls -l
+    - echo "Listing files in the cloned 'api' directory:"
+    - ls -l api/api 
     - echo "Building Docker image for production..."
     - cd api/api  # Naviguer vers le bon répertoire
     - docker build -t ${DOCKER_IMAGE_NAME}:prod -f Dockerfile.prod .
