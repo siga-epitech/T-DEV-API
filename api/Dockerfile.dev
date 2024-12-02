@@ -1,8 +1,5 @@
 FROM node:18-alpine
 
-# Définir bash comme shell par défaut
-SHELL ["/bin/bash", "-c"]
-
 # Définir le répertoire de travail
 WORKDIR /api
 
