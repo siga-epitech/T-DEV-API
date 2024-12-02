@@ -1,18 +1,13 @@
-FROM node:18-alpine
+FROM node:16
 
-# Définir le répertoire de travail
 WORKDIR /api
 
-# Copier les fichiers package*.json et installer les dépendances
 COPY package*.json ./
 
-RUN npm install lodash
+RUN npm install
 
-# Copier le reste des fichiers
 COPY . .
 
-# Exposer le port 3000 (ou un autre port selon ton application)
 EXPOSE 3000
 
-# Démarrer l'application
-CMD ["npm", "start"]
+CMD ["npm"]
