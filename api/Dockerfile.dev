@@ -1,17 +1,15 @@
 FROM node:18-alpine
 
+# Installer les outils réseau (ping)
+RUN apk add --no-cache iputils
+
 WORKDIR /api
 
 # Vérification de la connexion réseau
 RUN ping -c 4 google.com
 
 COPY package*.json ./
-
-# Essayer de réessayer l'installation de npm en cas d'erreur réseau
-RUN npm install -g npm@latest || (sleep 10 && npm install -g npm@latest)
-
-RUN npm install --verbose
-
+RUN npm install -g npm@latest && npm install --verbose
 COPY . .
 
 EXPOSE 3000
