@@ -1,5 +1,8 @@
 FROM node:18-alpine
 
+# Définir bash comme shell par défaut
+SHELL ["/bin/bash", "-c"]
+
 # Ajouter les outils nécessaires et tester la connectivité réseau
 RUN apk add --no-cache --update bind-tools bash iputils curl \
     && nslookup google.com \
@@ -10,7 +13,7 @@ WORKDIR /api
 
 # Copier les fichiers package*.json et installer les dépendances
 COPY package*.json ./
-RUN npm install -g npm@latest && npm install --verbose
+RUN npm install lodash
 
 # Copier le reste des fichiers
 COPY . .
