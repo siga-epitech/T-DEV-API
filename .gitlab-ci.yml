@@ -4,7 +4,8 @@ stages:
 trigger_devops_pipeline:
   stage: trigger_devops
   tags:
-    - robin
+    - sigaRunner
+    image: node:18
   script:
     - echo "Triggering pipeline in DevOps repository..."
     - |
