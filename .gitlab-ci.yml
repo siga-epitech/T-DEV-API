@@ -12,7 +12,7 @@ variables:
 clone_api:
   stage: clone
   tags:
-    - sigaTagRunner
+    - sigaRunner
   script:
     - echo "Current working directory:"
     - pwd
@@ -32,12 +32,12 @@ build_docker_image_dev:
   needs:
     - clone_api
   tags:
-    - sigaTagRunner
+    - sigaRunner
   script:
     - echo "Building Docker image for development..."
     - ls -l api 
     - docker build -t ${DOCKER_IMAGE_NAME}:dev -f api/api/Dockerfile.dev api/api/
-
+    # Cest pas plutot un docker compose ?
   rules:
     - if: '$ENVIRONMENT == "dev"'
 
@@ -46,7 +46,7 @@ build_docker_image_prod:
   needs:
     - clone_api
   tags:
-    - sigaTagRunner
+    - sigaRunner
   script:
     - echo "Building Docker image for production..."
     - ls -l api 
