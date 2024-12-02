@@ -36,7 +36,7 @@ build_docker_image_dev:
   script:
     - echo "Building Docker image for development..."
     - ls -l api/api
-    - docker build -t ${DOCKER_IMAGE_NAME}:dev -f api/api/Dockerfile.dev api/api/
+    - docker build --no-cache -t ${DOCKER_IMAGE_NAME}:dev -f api/api/Dockerfile.dev api/api/
     # Cest pas plutot un docker compose ?
   rules:
     - if: '$ENVIRONMENT == "dev"'
