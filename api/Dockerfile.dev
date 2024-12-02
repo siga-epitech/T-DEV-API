@@ -1,17 +1,24 @@
+# Utiliser l'image officielle Node.js version 18
 FROM node:18-alpine
 
-# Installer les outils réseau (ping)
-RUN apk add --no-cache iputils
+# Installer les outils réseau (ping et curl pour tester la connectivité)
+RUN apk add --no-cache iputils curl bash
 
+# Vérification de la connexion réseau avec ping
+RUN /bin/bash -c "ping -c 4 google.com || curl -I https://www.google.com"
+
+# Définir le répertoire de travail à /api
 WORKDIR /api
 
-# Vérification de la connexion réseau
-RUN ping -c 4 google.com
-
+# Copier les fichiers package*.json et installer les dépendances
 COPY package*.json ./
 RUN npm install -g npm@latest && npm install --verbose
+
+# Copier tous les fichiers du répertoire local dans le conteneur
 COPY . .
 
+# Exposer le port 3000 (utilisé pour les applications Node.js)
 EXPOSE 3000
 
+# Commande par défaut pour démarrer l'application
 CMD ["npm", "start"]
