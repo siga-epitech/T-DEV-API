@@ -4,7 +4,7 @@ stages:
 trigger_devops_pipeline:
   stage: trigger_devops
   tags:
-    - sigaRunner
+    - robin
   script:
     - echo "Triggering pipeline in DevOps repository..."
     - |
