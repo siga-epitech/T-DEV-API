@@ -12,7 +12,7 @@ variables:
 clone_api:
   stage: clone
   tags:
-    - robin
+    - sigaRunner
   script:
     - echo "Current working directory:"
     - pwd
@@ -32,7 +32,7 @@ build_docker_image_dev:
   needs:
     - clone_api
   tags:
-    - robin
+    - sigaRunner
   script:
     - echo "Building Docker image for development..."
     - ls -l api 
@@ -46,7 +46,7 @@ build_docker_image_prod:
   needs:
     - clone_api
   tags:
-    - robin
+    - sigaRunner
   script:
     - echo "Building Docker image for production..."
     - ls -l api 
