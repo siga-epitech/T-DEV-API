@@ -35,7 +35,7 @@ build_docker_image_dev:
     - sigaRunner
   script:
     - echo "Building Docker image for development..."
-    - ls -l api 
+    - ls -l api/api
     - docker build -t ${DOCKER_IMAGE_NAME}:dev -f api/api/Dockerfile.dev api/api/
     # Cest pas plutot un docker compose ?
   rules:
@@ -49,7 +49,7 @@ build_docker_image_prod:
     - sigaRunner
   script:
     - echo "Building Docker image for production..."
-    - ls -l api 
+    - ls -l api/api
     - docker build -t ${DOCKER_IMAGE_NAME}:prod -f api/api/Dockerfile.prod api/api/
   rules:
     - if: '$ENVIRONMENT == "prod"'
