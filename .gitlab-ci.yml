@@ -33,7 +33,7 @@ build_docker_image_dev:
   script:
     - echo "Building Docker image for development..."
     - ls -l app
-    - docker build --no-cache -t ${DOCKER_IMAGE_NAME}:dev -f app/app/Dockerfile.dev app/app/
+    - docker build --no-cache -t ${DOCKER_IMAGE_NAME}:dev -f app/apiDockerfile.dev app/api
   rules:
     - if: '$ENVIRONMENT == "dev"'
 
@@ -45,9 +45,8 @@ build_docker_image_prod:
     - sigaRunner
   script:
     - echo "Building Docker image for production..."
-    - ls -l app/app
-    - docker build -t ${DOCKER_IMAGE_NAME}:prod -f app/app/Dockerfile.prod app/app/
-    - docker run --rm -v $(pwd)/app:/app ${DOCKER_IMAGE_NAME}:prod ls /app
+    - ls -l app
+    - docker build -t ${DOCKER_IMAGE_NAME}:prod -f app/api/Dockerfile.prod app/api/
   rules:
     - if: '$ENVIRONMENT == "prod"'
 
