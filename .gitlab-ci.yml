@@ -3,9 +3,8 @@ stages:
   - build
   - deploy
 
-
 variables:
-  API_REPO_URL: "t-dev.epitest.eu/MAR_18/T-DEV-702-Api.git api/"
+  API_REPO_URL: "t-dev.epitest.eu/MAR_18/T-DEV-702-Api.git"
   API_BRANCH: "feature/ci-config"
   DOCKER_IMAGE_NAME: "t-dev-702-api"
   ENVIRONMENT: "" 
@@ -15,18 +14,15 @@ clone_api:
   tags:
     - sigaRunner
   script:
-    - echo "Current working directory:"
-    - pwd
     - echo "Cloning the API repository..."
-    - git clone --branch ${API_BRANCH} https://anthony.guarneri:${PERSONAL_ACCESS_TOKEN}@${API_REPO_URL}
+    - git clone --branch ${API_BRANCH} https://anthony.guarneri:${PERSONAL_ACCESS_TOKEN}@${API_REPO_URL} api
     - echo "Listing files in the current directory:"
     - ls -l
     - echo "Listing files in the cloned 'api' directory:"
     - ls -l api
   artifacts:
     paths:
-      - /
-
+      - api
 
 build_docker_image_dev:
   stage: build
@@ -37,8 +33,7 @@ build_docker_image_dev:
   script:
     - echo "Building Docker image for development..."
     - ls -l api/api
-    - docker build --no-cache  -t ${DOCKER_IMAGE_NAME}:dev -f api/api/Dockerfile.dev api/api/
-    # Cest pas plutot un docker compose ?
+    - docker build --no-cache -t ${DOCKER_IMAGE_NAME}:dev -f api/api/Dockerfile.dev api/api/
   rules:
     - if: '$ENVIRONMENT == "dev"'
 
@@ -55,7 +50,6 @@ build_docker_image_prod:
   rules:
     - if: '$ENVIRONMENT == "prod"'
 
-
 deploy_docker_prod:
   stage: deploy
   needs:
@@ -65,8 +59,7 @@ deploy_docker_prod:
   script:
     - echo "Starting Docker container for production with persistent data..."
     - docker volume create ${DOCKER_IMAGE_NAME}_prod_volume
-    - echo "Listing files in the current directory:"
     - docker run -d --name ${DOCKER_IMAGE_NAME}_prod -p 80:80 -v ${DOCKER_IMAGE_NAME}_prod_volume:/data ${DOCKER_IMAGE_NAME}:prod
     - echo "Container is running in detached mode with persistent volume."
   rules:
-    - if: '$ENVIRONMENT == "prod"'  
+    - if: '$ENVIRONMENT == "prod"'
