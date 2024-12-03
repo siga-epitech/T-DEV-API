@@ -55,12 +55,9 @@ build_docker_image_prod:
   rules:
     - if: '$ENVIRONMENT == "prod"'
 
-
     # Déploiement de l'image Docker en Prod
 deploy_docker_prod:
   stage: deploy
-  needs:
-    - build_docker_image_prod
   tags:
     - sigaRunner
   script:
