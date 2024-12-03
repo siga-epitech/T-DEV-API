@@ -7,7 +7,7 @@ variables:
   API_REPO_URL: "t-dev.epitest.eu/MAR_18/T-DEV-702-Api.git api/"
   API_BRANCH: "feature/ci-config"
   DOCKER_IMAGE_NAME: "t-dev-702-api"
-  ENVIRONMENT: "prod" 
+  ENVIRONMENT: "" 
 
 clone_api:
   stage: clone
@@ -36,7 +36,7 @@ build_docker_image_dev:
   script:
     - echo "Building Docker image for development..."
     - ls -l api/api
-    - docker build --no-cache --progress plain -t ${DOCKER_IMAGE_NAME}:dev -f api/api/Dockerfile.dev api/api/
+    - docker build --no-cache  -t ${DOCKER_IMAGE_NAME}:dev -f api/api/Dockerfile.dev api/api/
     # Cest pas plutot un docker compose ?
   rules:
     - if: '$ENVIRONMENT == "dev"'
