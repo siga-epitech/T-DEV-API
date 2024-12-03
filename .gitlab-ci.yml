@@ -1,5 +1,7 @@
 stages:
   - trigger_devops
+  - trigger_dev
+  - trigger_prod
 
 trigger_devops_dev:
   stage: trigger_dev
