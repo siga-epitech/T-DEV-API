@@ -2,15 +2,15 @@
   "name": "app",
   "version": "1.0.0",
   "main": "index.js",
+  "description": "An Express.js application running in Docker.",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["express", "docker", "api"],
+  "author": "Your Name",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "body-parser": "^1.20.3",
     "cors": "^2.8.5",
