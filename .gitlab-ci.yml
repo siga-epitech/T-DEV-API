@@ -19,7 +19,7 @@ clone_api:
     - echo "Listing files in the current directory:"
     - ls -l
     - echo "Listing files in the cloned 'api' directory:"
-    - ls -l api
+    - ls -l app
   artifacts:
     paths:
       - app
