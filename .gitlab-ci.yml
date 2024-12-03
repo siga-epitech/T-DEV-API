@@ -55,7 +55,7 @@ build_docker_image_prod:
     - if: '$ENVIRONMENT == "prod"'
 
 
-    deploy_docker_dev:
+deploy_docker_dev:
   stage: build
   needs:
     - build_docker_image_dev
