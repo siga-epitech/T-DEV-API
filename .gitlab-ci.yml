@@ -53,3 +53,32 @@ build_docker_image_prod:
     - docker build -t ${DOCKER_IMAGE_NAME}:prod -f api/api/Dockerfile.prod api/api/
   rules:
     - if: '$ENVIRONMENT == "prod"'
+
+
+    deploy_docker_dev:
+  stage: build
+  needs:
+    - build_docker_image_dev
+  tags:
+    - sigaRunner
+  script:
+    - echo "Starting Docker container for development with persistent data..."
+    - docker volume create ${DOCKER_IMAGE_NAME}_dev_volume
+    - docker run -d --name ${DOCKER_IMAGE_NAME}:dev -p 8080:8080 -v ${DOCKER_IMAGE_NAME}_dev_volume:/data ${DOCKER_IMAGE_NAME}:dev
+    - echo "Container is running in detached mode with persistent volume."
+  rules:
+    - if: '$ENVIRONMENT == "dev"'
+
+deploy_docker_prod:
+  stage: build
+  needs:
+    - build_docker_image_prod
+  tags:
+    - sigaRunner
+  script:
+    - echo "Starting Docker container for production with persistent data..."
+    - docker volume create ${DOCKER_IMAGE_NAME}_prod_volume
+    - docker run -d --name ${DOCKER_IMAGE_NAME}:prod -p 80:80 -v ${DOCKER_IMAGE_NAME}_prod_volume:/data ${DOCKER_IMAGE_NAME}:prod
+    - echo "Container is running in detached mode with persistent volume."
+  rules:
+    - if: '$ENVIRONMENT == "prod"'
