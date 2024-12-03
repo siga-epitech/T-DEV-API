@@ -102,7 +102,7 @@ test_api:
 test_mobile:
   stage: test
   needs:
-    - build_mobile
+    - build_api_or_mobile
   tags:
     - sigaRunner
   script:
@@ -115,7 +115,7 @@ test_mobile:
 deploy_api_dev:
   stage: deploy
   needs:
-    - build_api_or_mobile
+    - test_api
   tags:
     - sigaRunner
   script:
