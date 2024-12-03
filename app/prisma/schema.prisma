@@ -11,7 +11,7 @@ datasource db {
 
 generator client {
   provider      = "prisma-client-js"
-  binaryTargets = ["native", "linux-arm64-openssl-1.1.x"]
+  binaryTargets = ["native", "linux-arm64-openssl-1.1.x", "linux-arm64-openssl-3.0.x"]
   seed          = "ts-node prisma/seed.ts"
 }
 
@@ -33,5 +33,17 @@ model User {
   updatedAt      DateTime @updatedAt
 
   @@index([email])
+
+  @@map("users")
+}
+
+model Price {
+  id        Int      @id @default(autoincrement())
+  barcode   String   @unique
+  price     Float
+  currency  String   @default("EUR")
+  updatedAt DateTime @updatedAt
+
+  @@map("prices")
 }
 
