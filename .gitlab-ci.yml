@@ -58,8 +58,7 @@ deploy_docker_prod:
     - sigaRunner
   script:
     - echo "Starting Docker container for production with persistent data..."
-    - docker run -d --name ${DOCKER_IMAGE_NAME}_prod -p 80:80 -v ${DOCKER_IMAGE_NAME}_prod_volume:/data ${DOCKER_IMAGE_NAME}:prod tail -f /dev/null
+    - docker run -d --name ${DOCKER_IMAGE_NAME}_prod -p 3000:3000 ${DOCKER_IMAGE_NAME}:prod tail -f /dev/null
     - echo "Container is running in detached mode with persistent volume."
-    - echo docker logs ${DOCKER_IMAGE_NAME}_prod
   rules:
     - if: '$ENVIRONMENT == "prod"'
