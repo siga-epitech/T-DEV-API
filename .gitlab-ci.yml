@@ -6,8 +6,6 @@ stages:
 # Trigger le pipeline dans le projet DevOps (Dev)
 trigger_devops_dev:
   stage: trigger_dev
-  tags:
-    - sigaRunner
   trigger:
     project: "t-dev.epitest.eu/718"  # Remplacez par la variable d'environnement pour l'ID du projet
     branch: "dev"
@@ -20,8 +18,6 @@ trigger_devops_dev:
 # Trigger le pipeline dans le projet DevOps (Prod)
 trigger_devops_prod:
   stage: trigger_prod
-  tags:
-    - sigaRunner
   trigger:
     project: "t-dev.epitest.eu/718"  # Remplacez par la variable d'environnement pour l'ID du projet
     branch: "prod"
@@ -34,8 +30,6 @@ trigger_devops_prod:
 # Trigger le pipeline dans le projet DevOps (avec feature spécifique)
 trigger_devops_pipelines:
   stage: trigger_devops
-  tags:
-    - sigaRunner
   trigger:
     project: "t-dev.epitest.eu/718"  # Remplacez par la variable d'environnement pour l'ID du projet
     branch: "feature/docker-configuration-siga"
