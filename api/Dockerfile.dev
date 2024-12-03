@@ -1,13 +1,22 @@
-FROM node:18-alpine
+FROM node:18
 
+# Définir le répertoire de travail
 WORKDIR /api
 
+# Mettre à jour npm à la dernière version stable
+RUN npm install -g npm@latest
+
+# Copier uniquement les fichiers nécessaires pour installer les dépendances
 COPY package*.json ./
 
-RUN npm install
+# Installer les dépendances en nettoyant le cache
+RUN npm cache clean --force && npm install
 
+# Copier le reste du projet dans l'image
 COPY . .
 
+# Exposer le port utilisé par l'application
 EXPOSE 3000
 
+# Commande pour démarrer l'application
 CMD ["npm"]
