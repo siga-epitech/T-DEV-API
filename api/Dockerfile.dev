@@ -4,7 +4,7 @@ FROM node:18
 WORKDIR /api
 
 # Mettre à jour npm à la dernière version stable
-RUN npm install -g npm@latest
+RUN npm install 
 
 # Copier uniquement les fichiers nécessaires pour installer les dépendances
 COPY package*.json ./
