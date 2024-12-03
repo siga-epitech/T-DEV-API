@@ -3,65 +3,44 @@ stages:
   - trigger_dev
   - trigger_prod
 
+# Trigger le pipeline dans le projet DevOps (Dev)
 trigger_devops_dev:
   stage: trigger_dev
   tags:
     - sigaRunner
-  script:
-    - echo "Triggering pipeline in DevOps repository..."
-    - |
-      curl -X POST --fail \
-           -F token=${SIGA_DEVOPS_TRIGGER_TOKEN} \
-           -F ref=dev \
-           -F "variables[ENVIRONMENT]=dev" \
-           https://t-dev.epitest.eu/api/v4/projects/718/trigger/pipeline \
-      || echo "Failed to trigger Dev pipeline."
+  trigger:
+    project: "t-dev.epitest.eu/718"  # Remplacez par la variable d'environnement pour l'ID du projet
+    branch: "dev"
+    strategy: depend
+    variables:
+      ENVIRONMENT: "dev"
   only:
     - dev
-   #- dev
 
+# Trigger le pipeline dans le projet DevOps (Prod)
 trigger_devops_prod:
   stage: trigger_prod
   tags:
     - sigaRunner
-  script:
-    - echo "Triggering pipeline in DevOps repository..."
-    - |
-      curl -X POST --fail \
-           -F token=${SIGA_DEVOPS_TRIGGER_TOKEN} \
-           -F ref=prod \
-           -F "variables[ENVIRONMENT]=prod" \
-           https://t-dev.epitest.eu/api/v4/projects/718/trigger/pipeline \
-      || echo "Failed to trigger Prod pipeline."
+  trigger:
+    project: "t-dev.epitest.eu/718"  # Remplacez par la variable d'environnement pour l'ID du projet
+    branch: "prod"
+    strategy: depend
+    variables:
+      ENVIRONMENT: "prod"
   only:
     - prod
-   #- prod
-  
 
-
-
+# Trigger le pipeline dans le projet DevOps (avec feature spécifique)
 trigger_devops_pipelines:
   stage: trigger_devops
   tags:
     - sigaRunner
-  script:
-    - echo "Triggering pipeline in DevOps repository..."
-    - |
-      curl -X POST --fail \
-           -F token=${SIGA_DEVOPS_TRIGGER_TOKEN} \
-           -F ref=feature/docker-configuration-siga \
-           -F "variables[ENVIRONMENT]=prod" \
-           https://t-dev.epitest.eu/api/v4/projects/718/trigger/pipeline \
-      || echo "Failed to trigger DevOps pipeline."
+  trigger:
+    project: "t-dev.epitest.eu/718"  # Remplacez par la variable d'environnement pour l'ID du projet
+    branch: "feature/docker-configuration-siga"
+    strategy: depend
+    variables:
+      ENVIRONMENT: "prod"
   only:
     - feature/ci-config
-   #- prod
-
-
-  # Changer aussi la branche de Ref, car en realité on veux que le trigger ici active les jobs de dev donc on trigger les jobs de dev
-  # Changer la valeur de 718 (qui est l'id du repos) par une variable d'environnement
-  
-
-
-
-
