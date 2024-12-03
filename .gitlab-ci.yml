@@ -113,7 +113,7 @@ test_api:
     - echo "Running tests for the API..."
     - docker run --rm ${DOCKER_IMAGE_NAME_API}:${ENV} npm test
   rules:
-    - if: '$ENV == "prod || $REPO == "api"'
+    - if: '$ENV == "prod" || $REPO == "api"'
 
 # Tests pour le Mobile
 test_mobile:
@@ -126,7 +126,7 @@ test_mobile:
     - echo "Running tests for the Mobile..."
     - docker run --rm ${DOCKER_IMAGE_NAME_MOBILE}:${ENV} npm test
   rules:
-    - if: '$ENV == "prod || $REPO == "mobile"'
+    - if: '$ENV == "prod" || $REPO == "mobile"'
 
 # Déploiement en développement pour l'API
 deploy_api_dev:
