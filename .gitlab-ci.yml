@@ -127,7 +127,7 @@ test_mobile:
     - docker run --rm ${DOCKER_IMAGE_NAME_MOBILE}:${ENV} npm test
   rules:
     - if: '($REPO == "mobile") && ($ENV == "prod")'
-  when: manual 
+    - when: manual 
 
 ## Déploiement en développement pour l'API
 deploy_api_dev:
@@ -156,7 +156,7 @@ deploy_mobile_dev:
     - echo "Mobile app is deployed to development."
   rules:
     - if: '$ENV == "dev" && $REPO == "mobile"'
-  when: manual 
+    - when: manual 
 
 # Déploiement en production pour l'API
 deploy_api_prod:
@@ -185,4 +185,4 @@ deploy_mobile_prod:
     - echo "Mobile app is deployed to production."
   rules:
     - if: '$ENV == "prod" && $REPO == "mobile"'
-  when: manual 
+    - when: manual 
