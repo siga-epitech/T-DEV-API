@@ -38,7 +38,7 @@ trigger_devops_pipelines:
     - feature/ci-config
 
 
-    #test ici
+    
 
 
 
