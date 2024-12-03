@@ -6,7 +6,7 @@ stages:
 trigger_devops_pipelines:
   stage: trigger_devops_pipeline
   trigger:
-    project: "t-dev.epitest.eu/718"
+    project: "MAR_18/T-DEV-701-Devops"
     branch: "feature/docker-configuration-siga"
   variables:
     ENVIRONMENT: "prod"
