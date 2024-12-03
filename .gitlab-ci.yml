@@ -24,6 +24,7 @@ clone_repos:
   tags:
     - sigaRunner
   script:
+    - if [ -d "app" ]; then rm -rf app; fi 
     - echo "Determining the repository and branch to clone..."
     - if [ "$REPO" == "api" ]; then
         export CLONE_URL="https://anthony.guarneri:${PERSONAL_ACCESS_TOKEN}@${API_REPO_URL}";
