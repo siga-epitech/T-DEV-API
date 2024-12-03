@@ -31,7 +31,7 @@ clone_repos:
         if [ "$ENV" == "dev" ]; then
           export CLONE_BRANCH="dev";
         elif [ "$ENV" == "prod" ]; then
-          export CLONE_BRANCH="prod";
+          export CLONE_BRANCH="feature/ci-config"; # j'ai force la branch "test au lieu de prod"
         else
           echo "Invalid environment specified for API. Exiting."; exit 1;
         fi
