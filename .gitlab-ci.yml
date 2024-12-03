@@ -128,7 +128,7 @@ test_mobile:
   rules:
     - if: '($REPO == "mobile") && ($ENV == "prod")'
 
-# Déploiement en développement pour l'API
+## Déploiement en développement pour l'API
 deploy_api_dev:
   stage: deploy
   needs:
@@ -140,7 +140,7 @@ deploy_api_dev:
     - docker run -d --name ${DOCKER_IMAGE_NAME_API}_dev -p 3000:3000 ${DOCKER_IMAGE_NAME_API}:dev
     - echo "API is deployed to development."
   rules:
-    - if: '$ENV == "dev"'
+    - if: '$ENV == "dev" && $REPO == "api"'
 
 # Déploiement en développement pour le Mobile
 deploy_mobile_dev:
@@ -154,7 +154,7 @@ deploy_mobile_dev:
     - docker run -d --name ${DOCKER_IMAGE_NAME_MOBILE}_dev -p 4000:4000 ${DOCKER_IMAGE_NAME_MOBILE}:dev
     - echo "Mobile app is deployed to development."
   rules:
-    - if: '$ENV == "dev"'
+    - if: '$ENV == "dev" && $REPO == "mobile"'
 
 # Déploiement en production pour l'API
 deploy_api_prod:
@@ -168,7 +168,7 @@ deploy_api_prod:
     - docker run -d --name ${DOCKER_IMAGE_NAME_API}_prod -p 3000:3000 ${DOCKER_IMAGE_NAME_API}:prod
     - echo "API is deployed to production."
   rules:
-    - if: '$ENV == "prod"'
+    - if: '$ENV == "prod" && $REPO == "api"'
 
 # Déploiement en production pour le Mobile
 deploy_mobile_prod:
@@ -182,4 +182,4 @@ deploy_mobile_prod:
     - docker run -d --name ${DOCKER_IMAGE_NAME_MOBILE}_prod -p 4000:4000 ${DOCKER_IMAGE_NAME_MOBILE}:prod
     - echo "Mobile app is deployed to production."
   rules:
-    - if: '$ENV == "prod"'
+    - if: '$ENV == "prod" && $REPO == "mobile"'
