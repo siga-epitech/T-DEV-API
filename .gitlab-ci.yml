@@ -72,10 +72,10 @@ build_api_or_mobile:
     - sigaRunner
   script:
     - |
-      if [ "$ENVIRONMENT" == "dev" ]; then
+      if [ "$ENV" == "dev" ]; then
         echo "Building Docker image for the API in dev environment..."
         docker build -t ${DOCKER_IMAGE_NAME_API}:dev -f app/api/Dockerfile.dev app/api/
-      elif [ "$ENVIRONMENT" == "prod" ]; then
+      elif [ "$ENV" == "prod" ]; then
         echo "Building Docker image for the Mobile in prod environment..."
         docker build -t ${DOCKER_IMAGE_NAME_MOBILE}:prod -f mobile/Dockerfile.prod mobile/
       else
@@ -84,12 +84,12 @@ build_api_or_mobile:
       fi
   rules:
     - if: '$ENV == "dev" || $ENV == "prod"'
-    
+
 # Tests pour l'API
 test_api:
   stage: test
   needs:
-    - build_api
+    - build_api_or_mobile
   tags:
     - sigaRunner
   script:
@@ -115,7 +115,7 @@ test_mobile:
 deploy_api_dev:
   stage: deploy
   needs:
-    - build_api
+    - build_api_or_mobile
   tags:
     - sigaRunner
   script:
