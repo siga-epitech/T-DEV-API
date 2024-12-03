@@ -3,6 +3,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install --verbose
 COPY . .
+RUN ls -l /app/src
 EXPOSE 3000
 
 CMD ["npm", "start"]
