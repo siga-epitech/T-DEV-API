@@ -66,11 +66,6 @@ deploy_docker_prod:
     - echo "Starting Docker container for production with persistent data..."
     - docker volume create ${DOCKER_IMAGE_NAME}_prod_volume
     - echo "Listing files in the current directory:"
-    - ls -l
-    - echo "Listing files in the cloned 'api' directory:"
-    - ls -l api
-    - echo "Listing api api"
-    - ls -l api/api
     - docker run -d --name ${DOCKER_IMAGE_NAME}_prod -p 80:80 -v ${DOCKER_IMAGE_NAME}_prod_volume:/data ${DOCKER_IMAGE_NAME}:prod
     - echo "Container is running in detached mode with persistent volume."
   rules:
