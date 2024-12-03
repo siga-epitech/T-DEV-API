@@ -24,28 +24,32 @@ clone_repos:
   tags:
     - sigaRunner
   script:
-    - if [ -d "app" ]; then rm -rf app; fi 
     - echo "Determining the repository and branch to clone..."
-    - if [ "$REPO" == "api" ]; then
-        export CLONE_URL="https://anthony.guarneri:${PERSONAL_ACCESS_TOKEN}@${API_REPO_URL}";
+    - if [ -d "app" ]; then rm -rf app; fi
+    - |
+      if [ "$REPO" == "api" ]; then
+        export CLONE_URL="https://anthony.guarneri:${PERSONAL_ACCESS_TOKEN}@${API_REPO_URL}"
         if [ "$ENV" == "dev" ]; then
-          export CLONE_BRANCH="dev";
+          export CLONE_BRANCH="dev"
         elif [ "$ENV" == "prod" ]; then
-          export CLONE_BRANCH="feature/ci-config"; # j'ai force la branch "test au lieu de prod"
+          export CLONE_BRANCH="feature/ci-config"  
         else
-          echo "Invalid environment specified for API. Exiting."; exit 1;
+          echo "Invalid environment specified for API. Exiting."
+          exit 1
         fi
       elif [ "$REPO" == "mobile" ]; then
-        export CLONE_URL="https://anthony.guarneri:${PERSONAL_ACCESS_TOKEN}@${MOBILE_REPO_URL}";
+        export CLONE_URL="https://anthony.guarneri:${PERSONAL_ACCESS_TOKEN}@${MOBILE_REPO_URL}"
         if [ "$ENV" == "dev" ]; then
-          export CLONE_BRANCH="dev";
+          export CLONE_BRANCH="dev"
         elif [ "$ENV" == "prod" ]; then
-          export CLONE_BRANCH="prod";
+          export CLONE_BRANCH="prod"
         else
-          echo "Invalid environment specified for Mobile. Exiting."; exit 1;
+          echo "Invalid environment specified for Mobile. Exiting."
+          exit 1
         fi
       else
-        echo "No valid repository specified. Exiting."; exit 1;
+        echo "No valid repository specified. Exiting."
+        exit 1
       fi
     - echo "Cloning from $CLONE_URL on branch $CLONE_BRANCH..."
     - git clone --branch $CLONE_BRANCH $CLONE_URL app
@@ -56,6 +60,8 @@ clone_repos:
   artifacts:
     paths:
       - app
+
+  
 
 # Build Docker image pour l'API
 build_api:
