@@ -13,7 +13,6 @@ trigger_devops_dev:
     ENVIRONMENT: "dev"
   only:
     - dev
-    - feature/ci-setup
 
 # Trigger le pipeline dans le projet DevOps (Prod)
 trigger_devops_prod:
@@ -31,9 +30,10 @@ trigger_devops_pipelines:
   stage: trigger_devops_pipeline
   trigger:
     project: "MAR_18/T-DEV-701-Devops"
-    branch: "feature/docker-configuration-siga"
+    branch: "feature/ci-config"
   variables:
     ENVIRONMENT: "prod"
+    REPO: "api"
   only:
     - feature/ci-config
 
