@@ -72,9 +72,9 @@ build_api:
     - sigaRunner
   script:
     - echo "Building Docker image for the API..."
-    - docker build -t ${DOCKER_IMAGE_NAME_API}:${ENVIRONMENT} -f app/api/Dockerfile.${ENVIRONMENT} app/api/
+    - docker build -t ${DOCKER_IMAGE_NAME_API}:${ENV} -f app/api/Dockerfile.${ENV} app/api/
   rules:
-    - if: '$ENVIRONMENT == "dev" || $ENVIRONMENT == "prod"'
+    - if: '$ENV == "dev" || $ENV == "prod"'
 
 # Build Docker image pour le Mobile
 build_mobile:
@@ -85,9 +85,9 @@ build_mobile:
     - sigaRunner
   script:
     - echo "Building Docker image for Mobile..."
-    - docker build -t ${DOCKER_IMAGE_NAME_MOBILE}:${ENVIRONMENT} -f mobile/Dockerfile.${ENVIRONMENT} mobile/
+    - docker build -t ${DOCKER_IMAGE_NAME_MOBILE}:${ENV} -f mobile/Dockerfile.${ENV} mobile/
   rules:
-    - if: '$ENVIRONMENT == "dev" || $ENVIRONMENT == "prod"'
+    - if: '$ENV == "dev" || $ENV == "prod"'
 
 # Tests pour l'API
 test_api:
@@ -98,9 +98,9 @@ test_api:
     - sigaRunner
   script:
     - echo "Running tests for the API..."
-    - docker run --rm ${DOCKER_IMAGE_NAME_API}:${ENVIRONMENT} npm test
+    - docker run --rm ${DOCKER_IMAGE_NAME_API}:${ENV} npm test
   rules:
-    - if: '$ENVIRONMENT == "dev" || $ENVIRONMENT == "prod"'
+    - if: '$ENV == "dev" || $ENV == "prod"'
 
 # Tests pour le Mobile
 test_mobile:
@@ -111,9 +111,9 @@ test_mobile:
     - sigaRunner
   script:
     - echo "Running tests for the Mobile..."
-    - docker run --rm ${DOCKER_IMAGE_NAME_MOBILE}:${ENVIRONMENT} npm test
+    - docker run --rm ${DOCKER_IMAGE_NAME_MOBILE}:${ENV} npm test
   rules:
-    - if: '$ENVIRONMENT == "dev" || $ENVIRONMENT == "prod"'
+    - if: '$ENV == "dev" || $ENV == "prod"'
 
 # Déploiement en développement pour l'API
 deploy_api_dev:
@@ -127,7 +127,7 @@ deploy_api_dev:
     - docker run -d --name ${DOCKER_IMAGE_NAME_API}_dev -p 3000:3000 ${DOCKER_IMAGE_NAME_API}:dev
     - echo "API is deployed to development."
   rules:
-    - if: '$ENVIRONMENT == "dev"'
+    - if: '$ENV == "dev"'
 
 # Déploiement en développement pour le Mobile
 deploy_mobile_dev:
@@ -141,7 +141,7 @@ deploy_mobile_dev:
     - docker run -d --name ${DOCKER_IMAGE_NAME_MOBILE}_dev -p 4000:4000 ${DOCKER_IMAGE_NAME_MOBILE}:dev
     - echo "Mobile app is deployed to development."
   rules:
-    - if: '$ENVIRONMENT == "dev"'
+    - if: '$ENV == "dev"'
 
 # Déploiement en production pour l'API
 deploy_api_prod:
@@ -155,7 +155,7 @@ deploy_api_prod:
     - docker run -d --name ${DOCKER_IMAGE_NAME_API}_prod -p 3000:3000 ${DOCKER_IMAGE_NAME_API}:prod
     - echo "API is deployed to production."
   rules:
-    - if: '$ENVIRONMENT == "prod"'
+    - if: '$ENV == "prod"'
 
 # Déploiement en production pour le Mobile
 deploy_mobile_prod:
@@ -169,4 +169,4 @@ deploy_mobile_prod:
     - docker run -d --name ${DOCKER_IMAGE_NAME_MOBILE}_prod -p 4000:4000 ${DOCKER_IMAGE_NAME_MOBILE}:prod
     - echo "Mobile app is deployed to production."
   rules:
-    - if: '$ENVIRONMENT == "prod"'
+    - if: '$ENV == "prod"'
