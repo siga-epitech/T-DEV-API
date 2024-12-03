@@ -7,9 +7,9 @@ stages:
 trigger_devops_dev:
   stage: trigger_dev
   trigger:
-    project: "t-dev.epitest.eu/718"  # Remplacez par la variable d'environnement pour l'ID du projet
+    project: "t-dev.epitest.eu/718"  
     branch: "dev"
-    strategy: depend
+    strategy: none
   variables:
     ENVIRONMENT: "dev"
   only:
@@ -19,9 +19,9 @@ trigger_devops_dev:
 trigger_devops_prod:
   stage: trigger_prod
   trigger:
-    project: "t-dev.epitest.eu/718"  # Remplacez par la variable d'environnement pour l'ID du projet
+    project: "t-dev.epitest.eu/718"  
     branch: "prod"
-    strategy: depend
+    strategy: none
   variables:
     ENVIRONMENT: "prod"
   only:
@@ -31,9 +31,9 @@ trigger_devops_prod:
 trigger_devops_pipelines:
   stage: trigger_devops
   trigger:
-    project: "t-dev.epitest.eu/718"  # Remplacez par la variable d'environnement pour l'ID du projet
+    project: "t-dev.epitest.eu/718" 
     branch: "feature/docker-configuration-siga"
-    strategy: depend
+    strategy: none
   variables:
     ENVIRONMENT: "prod"
   only:
