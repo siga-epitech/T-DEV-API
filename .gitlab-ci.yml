@@ -17,7 +17,7 @@ trigger_devops_dev:
            https://t-dev.epitest.eu/api/v4/projects/718/trigger/pipeline \
       || echo "Failed to trigger Dev pipeline."
   only:
-    - feature/ci-config
+    - dev
    #- dev
 
 trigger_devops_prod:
@@ -34,7 +34,7 @@ trigger_devops_prod:
            https://t-dev.epitest.eu/api/v4/projects/718/trigger/pipeline \
       || echo "Failed to trigger Prod pipeline."
   only:
-    - feature/ci-config
+    - prod
    #- prod
   
 
