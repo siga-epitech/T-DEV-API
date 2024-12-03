@@ -16,7 +16,7 @@ variables:
   DOCKER_IMAGE_NAME_MOBILE: "t-dev-703-mobile"
   API_BRANCH: "feature/ci-config"  # à configurer plus tard
   MOBILE_BRANCH: "feature/ci-config"  # à configurer plus tard
-  ENVIRONMENT: "prod"  # à configurer selon le contexte (dev, prod)
+  ENV: "prod"  # à configurer selon le contexte (dev, prod) dans le trigger master
 
 # Étape de clonage des dépôts
 clone_repos:
@@ -70,7 +70,7 @@ build_api:
     - if: '$ENVIRONMENT == "dev" || $ENVIRONMENT == "prod"'
 
 # Build Docker image pour le Mobile
-build_docker_mobile:
+build_mobile:
   stage: build
   needs:
     - clone_repos
@@ -127,6 +127,7 @@ deploy_mobile_dev:
   stage: deploy
   needs:
     - build_docker_mobile
+    - test_mobile
   tags:
     - sigaRunner
   script:
@@ -141,6 +142,7 @@ deploy_api_prod:
   stage: deploy
   needs:
     - build_api
+    - test_api
   tags:
     - sigaRunner
   script:
