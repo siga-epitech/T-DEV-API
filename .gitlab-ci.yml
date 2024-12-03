@@ -72,18 +72,35 @@ build_api_or_mobile:
     - sigaRunner
   script:
     - |
-      if [ "$ENV" == "dev" ]; then
-        echo "Building Docker image for the API in dev environment..."
-        docker build -t ${DOCKER_IMAGE_NAME_API}:dev -f app/api/Dockerfile.dev app/api/
-      elif [ "$ENV" == "prod" ]; then
-        echo "Building Docker image for the Mobile in prod environment..."
-        docker build -t ${DOCKER_IMAGE_NAME_MOBILE}:prod -f mobile/Dockerfile.prod mobile/
+      if [ "$REPO" == "api" ]; then
+        if [ "$ENV" == "dev" ]; then
+          echo "Building Docker image for the API in dev environment..."
+          docker build -t ${DOCKER_IMAGE_NAME_API}:dev -f app/api/Dockerfile.dev app/api/
+        elif [ "$ENV" == "prod" ]; then
+          echo "Building Docker image for the API in prod environment..."
+          docker build -t ${DOCKER_IMAGE_NAME_API}:prod -f app/api/Dockerfile.prod app/api/
+        else
+          echo "Unknown environment for API, exiting..."
+          exit 1
+        fi
+      elif [ "$REPO" == "mobile" ]; then
+        if [ "$ENV" == "dev" ]; then
+          echo "Building Docker image for the Mobile in dev environment..."
+          docker build -t ${DOCKER_IMAGE_NAME_MOBILE}:dev -f mobile/Dockerfile.dev mobile/
+        elif [ "$ENV" == "prod" ]; then
+          echo "Building Docker image for the Mobile in prod environment..."
+          docker build -t ${DOCKER_IMAGE_NAME_MOBILE}:prod -f mobile/Dockerfile.prod mobile/
+        else
+          echo "Unknown environment for Mobile, exiting..."
+          exit 1
+        fi
       else
-        echo "Unknown environment, exiting..."
+        echo "Unknown repository, exiting..."
         exit 1
       fi
   rules:
     - if: '$ENV == "dev" || $ENV == "prod"'
+
 
 # Tests pour l'API
 test_api:
