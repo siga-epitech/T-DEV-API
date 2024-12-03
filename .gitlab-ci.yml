@@ -15,14 +15,14 @@ clone_api:
     - sigaRunner
   script:
     - echo "Cloning the API repository..."
-    - git clone --branch ${API_BRANCH} https://anthony.guarneri:${PERSONAL_ACCESS_TOKEN}@${API_REPO_URL} api
+    - git clone --branch ${API_BRANCH} https://anthony.guarneri:${PERSONAL_ACCESS_TOKEN}@${API_REPO_URL} app
     - echo "Listing files in the current directory:"
     - ls -l
     - echo "Listing files in the cloned 'api' directory:"
     - ls -l api
   artifacts:
     paths:
-      - api
+      - app
 
 build_docker_image_dev:
   stage: build
@@ -32,8 +32,8 @@ build_docker_image_dev:
     - sigaRunner
   script:
     - echo "Building Docker image for development..."
-    - ls -l api/api
-    - docker build --no-cache -t ${DOCKER_IMAGE_NAME}:dev -f api/api/Dockerfile.dev api/api/
+    - ls -l app
+    - docker build --no-cache -t ${DOCKER_IMAGE_NAME}:dev -f app/app/Dockerfile.dev app/app/
   rules:
     - if: '$ENVIRONMENT == "dev"'
 
@@ -45,9 +45,9 @@ build_docker_image_prod:
     - sigaRunner
   script:
     - echo "Building Docker image for production..."
-    - ls -l api/api
-    - docker build -t ${DOCKER_IMAGE_NAME}:prod -f api/api/Dockerfile.prod api/api/
-    - docker run --rm -v $(pwd)/api:/app ${DOCKER_IMAGE_NAME}:prod ls /app
+    - ls -l app/app
+    - docker build -t ${DOCKER_IMAGE_NAME}:prod -f app/app/Dockerfile.prod app/app/
+    - docker run --rm -v $(pwd)/app:/app ${DOCKER_IMAGE_NAME}:prod ls /app
   rules:
     - if: '$ENVIRONMENT == "prod"'
 
