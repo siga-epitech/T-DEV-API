@@ -1,121 +1,161 @@
 stages:
-  - install
+  - clone
   - build
   - test
   - deploy
 
-# Variables globales
+# Variables de configuration
 variables:
-  NODE_ENV: 'production'
-  DOCKER_HOST: "tcp://docker:2375/"
-  DOCKER_TLS_CERTDIR: ""
+  API_REPO_URL: "t-dev.epitest.eu/MAR_18/T-DEV-702-Api.git"
+  MOBILE_REPO_URL: "t-dev.epitest.eu/MAR_18/T-DEV-703-Mobile.git"
+  DOCKER_IMAGE_NAME_API: "t-dev-702-api"
+  DOCKER_IMAGE_NAME_MOBILE: "t-dev-703-mobile"
+  API_BRANCH: "feature/ci-config"  # à configurer plus tard
+  MOBILE_BRANCH: "feature/ci-config"  # à configurer plus tard
+  ENVIRONMENT: ""  # à configurer selon le contexte (dev, prod)
 
-# Utilisation des runners Docker
-default:
-  image: docker:latest
-  services:
-    - docker:dind
-  before_script:
-    - apk add --no-cache npm
-    - npm install -g npm@latest
-
-# Étape d'installation des dépendances pour le frontend
-install_frontend:
-  stage: install
+# Étape de clonage des dépôts
+clone_repos:
+  stage: clone
+  tags:
+    - sigaRunner
   script:
-    - echo "Installing frontend dependencies"
-    - cd trinity
-    - npm install
-    - echo "Frontend dependencies installed"
+    - echo "Determining the repository and branch to clone..."
+    - if [ "$REPOAPI" == "api" ]; then
+        export CLONE_URL="https://anthony.guarneri:${PERSONAL_ACCESS_TOKEN}@${API_REPO_URL}";
+        if [ "$ENV" == "dev" ]; then
+          export CLONE_BRANCH="dev";
+        elif [ "$ENV" == "prod" ]; then
+          export CLONE_BRANCH="prod";
+        else
+          echo "Invalid environment specified for API. Exiting."; exit 1;
+        fi
+      elif [ "$REPOMOBILE" == "mobile" ]; then
+        export CLONE_URL="https://anthony.guarneri:${PERSONAL_ACCESS_TOKEN}@${MOBILE_REPO_URL}";
+        if [ "$ENV" == "dev" ]; then
+          export CLONE_BRANCH="dev";
+        elif [ "$ENV" == "prod" ]; then
+          export CLONE_BRANCH="prod";
+        else
+          echo "Invalid environment specified for Mobile. Exiting."; exit 1;
+        fi
+      else
+        echo "No valid repository specified. Exiting."; exit 1;
+      fi
+    - echo "Cloning from $CLONE_URL on branch $CLONE_BRANCH..."
+    - git clone --branch $CLONE_BRANCH $CLONE_URL app
+    - echo "Listing files in the current directory:"
+    - ls -l
+    - echo "Listing files in the cloned repository directory:"
+    - ls -l app
   artifacts:
     paths:
-      - trinity/node_modules
-  only:
-    - feature/docker-configuration-siga
-    - main
-    - dev
+      - app
 
-
-# Étape d'installation des dépendances pour le backend
-install_backend:
-  stage: install
-  script:
-    - echo "Installing backend dependencies"
-    - cd app
-    - npm install
-    - echo "Backend dependencies installed"
-  artifacts:
-    paths:
-      - app/node_modules
-  only:
-    - feature/docker-configuration-siga
-    - main
-    - dev
-
-
-# Étape de build du frontend
-build_frontend:
+# Build Docker image pour l'API
+build_api:
   stage: build
+  needs:
+    - clone_repos
+  tags:
+    - sigaRunner
   script:
-    - echo "Building frontend"
-    - cd trinity
-    - npm run build
-    - echo "Frontend built successfully"
-  artifacts:
-    paths:
-      - trinity/build
-  only:
-    - feature/docker-configuration-siga
-    - main
-    - dev
+    - echo "Building Docker image for the API..."
+    - docker build -t ${DOCKER_IMAGE_NAME_API}:${ENVIRONMENT} -f app/api/Dockerfile.${ENVIRONMENT} app/api/
+  rules:
+    - if: '$ENVIRONMENT == "dev" || $ENVIRONMENT == "prod"'
 
+# Build Docker image pour le Mobile
+build_docker_mobile:
+  stage: build
+  needs:
+    - clone_repos
+  tags:
+    - sigaRunner
+  script:
+    - echo "Building Docker image for Mobile..."
+    - docker build -t ${DOCKER_IMAGE_NAME_MOBILE}:${ENVIRONMENT} -f mobile/Dockerfile.${ENVIRONMENT} mobile/
+  rules:
+    - if: '$ENVIRONMENT == "dev" || $ENVIRONMENT == "prod"'
 
-# Étape de tests pour le frontend
-test_frontend:
+# Tests pour l'API
+test_api:
   stage: test
+  needs:
+    - build_api
+  tags:
+    - sigaRunner
   script:
-    - echo "Running frontend tests"
-    - cd trinity
-    - npm test
-    - echo "Frontend tests completed"
-  only:
-    - main
-    - dev
+    - echo "Running tests for the API..."
+    - docker run --rm ${DOCKER_IMAGE_NAME_API}:${ENVIRONMENT} npm test
+  rules:
+    - if: '$ENVIRONMENT == "dev" || $ENVIRONMENT == "prod"'
 
-
-# Étape de tests pour le backend
-test_backend:
+# Tests pour le Mobile
+test_mobile:
   stage: test
+  needs:
+    - build_docker_mobile
+  tags:
+    - sigaRunner
   script:
-    - echo "Running backend tests"
-    - cd app
-    - npm test
-    - echo "Backend tests completed"
-  only:
-    - feature/docker-configuration-siga
-    - main
-    - dev
+    - echo "Running tests for the Mobile..."
+    - docker run --rm ${DOCKER_IMAGE_NAME_MOBILE}:${ENVIRONMENT} npm test
+  rules:
+    - if: '$ENVIRONMENT == "dev" || $ENVIRONMENT == "prod"'
 
-
-# Étape de déploiement pour l'environnement de développement
-deploy_dev:
+# Déploiement en développement pour l'API
+deploy_api_dev:
   stage: deploy
+  needs:
+    - build_api
+  tags:
+    - sigaRunner
   script:
-    - echo "Déploiement sur l'environnement de développement"
-    - docker-compose -f ./docker-compose.dev.yml up --build -d
-  only:
-    - feature/docker-configuration-siga
-    - dev
+    - echo "Deploying API to development..."
+    - docker run -d --name ${DOCKER_IMAGE_NAME_API}_dev -p 3000:3000 ${DOCKER_IMAGE_NAME_API}:dev
+    - echo "API is deployed to development."
+  rules:
+    - if: '$ENVIRONMENT == "dev"'
 
-
-# Étape de déploiement pour l'environnement de production
-deploy_prod:
+# Déploiement en développement pour le Mobile
+deploy_mobile_dev:
   stage: deploy
+  needs:
+    - build_docker_mobile
+  tags:
+    - sigaRunner
   script:
-    - echo "Déploiement sur l'environnement de production"
-    - docker-compose -f ./docker-compose.prod.yml up --build -d
-  only:
-    - feature/docker-configuration-siga
-    - main
-  when: manual  # Optionnel, pour le déploiement manuel en production
+    - echo "Deploying Mobile to development..."
+    - docker run -d --name ${DOCKER_IMAGE_NAME_MOBILE}_dev -p 4000:4000 ${DOCKER_IMAGE_NAME_MOBILE}:dev
+    - echo "Mobile app is deployed to development."
+  rules:
+    - if: '$ENVIRONMENT == "dev"'
 
+# Déploiement en production pour l'API
+deploy_api_prod:
+  stage: deploy
+  needs:
+    - build_api
+  tags:
+    - sigaRunner
+  script:
+    - echo "Deploying API to production..."
+    - docker run -d --name ${DOCKER_IMAGE_NAME_API}_prod -p 3000:3000 ${DOCKER_IMAGE_NAME_API}:prod
+    - echo "API is deployed to production."
+  rules:
+    - if: '$ENVIRONMENT == "prod"'
+
+# Déploiement en production pour le Mobile
+deploy_mobile_prod:
+  stage: deploy
+  needs:
+    - build_docker_mobile
+  tags:
+    - sigaRunner
+  script:
+    - echo "Deploying Mobile to production..."
+    - docker run -d --name ${DOCKER_IMAGE_NAME_MOBILE}_prod -p 4000:4000 ${DOCKER_IMAGE_NAME_MOBILE}:prod
+    - echo "Mobile app is deployed to production."
+  rules:
+    - if: '$ENVIRONMENT == "prod"'
