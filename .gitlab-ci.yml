@@ -9,7 +9,6 @@ trigger_devops_dev:
   trigger:
     project: "t-dev.epitest.eu/718"  
     branch: "dev"
-    strategy: none
   variables:
     ENVIRONMENT: "dev"
   only:
@@ -21,7 +20,6 @@ trigger_devops_prod:
   trigger:
     project: "t-dev.epitest.eu/718"  
     branch: "prod"
-    strategy: none
   variables:
     ENVIRONMENT: "prod"
   only:
@@ -33,7 +31,6 @@ trigger_devops_pipelines:
   trigger:
     project: "t-dev.epitest.eu/718" 
     branch: "feature/docker-configuration-siga"
-    strategy: none
   variables:
     ENVIRONMENT: "prod"
   only:
