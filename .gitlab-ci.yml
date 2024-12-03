@@ -58,4 +58,3 @@ build_docker_image_prod:
   rules:
     - if: '$ENVIRONMENT == "prod"'
 
-≈
