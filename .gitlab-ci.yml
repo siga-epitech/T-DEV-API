@@ -4,10 +4,11 @@ stages:
   - trigger_prod
 
 # Trigger le pipeline dans le projet DevOps (Dev)
-trigger_devops_dev:
-  stage: trigger_dev
+stage: 
+  - trigger_dev
+trigger_devops_dev:  
   trigger:
-    project: "t-dev.epitest.eu/718"  # Remplacez par le nom correct ou une variable d'environnement pour l'ID du projet
+    project: "t-dev.epitest.eu/718"  
     branch: "dev"
   variables:
     ENVIRONMENT: "dev"
@@ -16,10 +17,11 @@ trigger_devops_dev:
     - feature/ci-setup
 
 # Trigger le pipeline dans le projet DevOps (Prod)
+stage: 
+  - trigger_prod
 trigger_devops_prod:
-  stage: trigger_prod
   trigger:
-    project: "t-dev.epitest.eu/718"  # Remplacez par le nom correct ou une variable d'environnement pour l'ID du projet
+    project: "t-dev.epitest.eu/718"  
     branch: "prod"
   variables:
     ENVIRONMENT: "prod"
@@ -27,12 +29,15 @@ trigger_devops_prod:
     - prod
 
 # Trigger le pipeline dans le projet DevOps pour une feature spécifique
+stage: 
+  - trigger_devops_pipeline
 trigger_devops_pipelines:
-  stage: trigger_devops_pipeline
   trigger:
-    project: "t-dev.epitest.eu/718"  # Remplacez par le nom correct ou une variable d'environnement pour l'ID du projet
+    project: "t-dev.epitest.eu/718"  
     branch: "feature/docker-configuration-siga"
   variables:
     ENVIRONMENT: "prod"
   only:
     - feature/ci-config
+
+
