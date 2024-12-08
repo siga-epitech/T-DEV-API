@@ -1,7 +1,6 @@
 stages:
   - clone
   - build
-  - test
   - deploy
 
 
