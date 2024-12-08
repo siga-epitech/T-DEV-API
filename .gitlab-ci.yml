@@ -186,3 +186,6 @@ deploy_mobile_prod:
   rules:
     - if: '$ENV == "prod" && $REPO == "mobile"'
     - when: manual 
+
+
+#test launch from repos devops
