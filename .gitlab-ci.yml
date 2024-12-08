@@ -30,7 +30,7 @@ trigger_devops_pipelines:
   stage: trigger_devops_pipeline
   trigger:
     project: "MAR_18/T-DEV-701-Devops"
-    branch: "feature/docker-configuration-siga"
+    branch: "feature/ci-config"
   variables:
     ENVIRONMENT: "prod"
     ENV: "prod"
