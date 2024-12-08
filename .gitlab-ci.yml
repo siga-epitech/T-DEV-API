@@ -9,7 +9,7 @@ variables:
   API_REPO_URL: "t-dev.epitest.eu/MAR_18/T-DEV-702-Api.git"
   MOBILE_REPO_URL: "t-dev.epitest.eu/MAR_18/T-DEV-703-Mobile.git"
   
-  REPO: "api"
+  #REPO: "api"
 
 
   DOCKER_IMAGE_NAME_API: "t-dev-702-api"
