@@ -37,6 +37,7 @@ trigger_devops_pipelines:
     REPO: "api"
   only:
     - feature/ci-config
+    - main
 
 # Launcher ici
 
