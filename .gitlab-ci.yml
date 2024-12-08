@@ -33,7 +33,7 @@ trigger_devops_pipelines:
     branch: "main"
   variables:
     ENVIRONMENT: "prod"
-    ENV: "dev"
+    ENV: "prod"
     REPO: "api"
   only:
     - feature/ci-config
