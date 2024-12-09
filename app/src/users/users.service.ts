@@ -7,10 +7,28 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
+  // Vérifier si un rôle existe
+  private async validateRole(roleId: number) {
+    const role = await this.prisma.role.findUnique({ where: { id: roleId } });
+    if (!role) {
+      throw new NotFoundException(`Rôle avec l'ID ${roleId} non trouvé.`);
+    }
+  }
+
   // Créer un utilisateur
   async createUser(createUserDto: CreateUserDto) {
+    // Attribuer un rôle par défaut si `roleId` n'est pas fourni
+    const defaultRole = await this.prisma.role.findUnique({ where: { name: 'client' } });
+    const roleId = createUserDto.roleId || defaultRole.id;
+
+    // Vérifier si le rôle existe
+    await this.validateRole(roleId);
+
     return this.prisma.user.create({
-      data: createUserDto,
+      data: {
+        ...createUserDto,
+        roleId,
+      },
     });
   }
 
@@ -36,6 +54,11 @@ export class UsersService {
 
     if (!userExists) {
       throw new NotFoundException(`Utilisateur avec l'ID ${id} non trouvé.`);
+    }
+
+    if (updateUserDto.roleId) {
+      // Vérifier si le rôle existe
+      await this.validateRole(updateUserDto.roleId);
     }
 
     return this.prisma.user.update({
