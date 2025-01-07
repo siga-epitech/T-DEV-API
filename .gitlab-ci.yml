@@ -1,0 +1,48 @@
+stages:
+  - trigger_devops_pipeline
+  - trigger_dev
+  - trigger_prod
+
+# Trigger le pipeline dans le projet DevOps (Dev)
+trigger_devops_dev:
+  stage: trigger_dev
+  trigger:
+    project: "MAR_18/T-DEV-701-Devops"
+    branch: "dev"
+  variables:
+    ENVIRONMENT: "dev"
+  only:
+    - dev
+
+# Trigger le pipeline dans le projet DevOps (Prod)
+trigger_devops_prod:
+  stage: trigger_prod
+  trigger:
+    project: "MAR_18/T-DEV-701-Devops"
+    branch: "prod"
+  variables:
+    ENVIRONMENT: "prod"
+  only:
+    - prod
+
+# Trigger le pipeline dans le projet DevOps pour une feature spécifique // test
+trigger_devops_pipelines:
+  stage: trigger_devops_pipeline
+  trigger:
+    project: "MAR_18/T-DEV-701-Devops"
+    branch: "main"
+  variables:
+    ENVIRONMENT: "prod"
+    ENV: "prod"
+    REPO: "api"
+  only:
+    #- feature/ci-config
+    #- main
+
+# dont ignore les fichiers .gitlab.yml
+
+
+    
+
+
+
