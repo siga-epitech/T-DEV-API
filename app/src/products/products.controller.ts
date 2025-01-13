@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, Body, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, BadRequestException, NotFoundException } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Public } from 'src/common/public.decorator';
@@ -73,7 +73,7 @@ export class ProductsController {
     try {
       const products = await this.prisma.product.findMany({
         include: {
-          nutritionalInfo: true, // Inclut les infos nutritionnelles liées, si elles existent
+          nutritionalInfo: true,
         },
       });
       return { status: 200, products };
@@ -82,5 +82,26 @@ export class ProductsController {
       throw new BadRequestException('Impossible de récupérer les produits');
     }
   }
-}
 
+  @Public()
+  @Get('id/:id')
+  async getProductById(@Param('id') id: string) {
+    try {
+      const product = await this.prisma.product.findUnique({
+        where: { id: parseInt(id, 10) },
+        include: {
+          nutritionalInfo: true, // Inclut les infos nutritionnelles si elles existent
+        },
+      });
+
+      if (!product) {
+        throw new NotFoundException(`Produit avec l'ID ${id} introuvable`);
+      }
+
+      return { status: 200, product };
+    } catch (error) {
+      console.error('Erreur lors de la récupération du produit par ID', error);
+      throw new BadRequestException('Impossible de récupérer le produit');
+    }
+  }
+}
