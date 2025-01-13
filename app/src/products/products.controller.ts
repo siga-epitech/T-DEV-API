@@ -29,10 +29,7 @@ export class ProductsController {
     }
 
     try {
-      // Récupérer les informations du produit depuis Open Food Facts
       const productData = await this.productsService.getProductFromOpenFoodFacts(barcode);
-
-      // Vérifier si le produit existe déjà dans la base de données
       const existingProduct = await this.prisma.product.findUnique({
         where: { barcode: productData.barcode },
       });
@@ -41,7 +38,6 @@ export class ProductsController {
         return { status: 409, message: 'Le produit existe déjà dans la base de données' };
       }
 
-      // Créer le produit dans la table "product"
       const createdProduct = await this.prisma.product.create({
         data: {
           name: productData.name,
@@ -51,7 +47,6 @@ export class ProductsController {
         },
       });
 
-      // Créer les informations nutritionnelles dans la table "nutritionalInfo"
       await this.prisma.nutritionalInfo.create({
         data: {
           product_id: createdProduct.id,
@@ -69,6 +64,22 @@ export class ProductsController {
     } catch (error) {
       console.error('Erreur lors de l\'ajout du produit', error);
       throw new BadRequestException('Impossible d\'ajouter le produit');
+    }
+  }
+
+  @Public()
+  @Get()
+  async getAllProducts() {
+    try {
+      const products = await this.prisma.product.findMany({
+        include: {
+          nutritionalInfo: true, // Inclut les infos nutritionnelles liées, si elles existent
+        },
+      });
+      return { status: 200, products };
+    } catch (error) {
+      console.error('Erreur lors de la récupération des produits', error);
+      throw new BadRequestException('Impossible de récupérer les produits');
     }
   }
 }
