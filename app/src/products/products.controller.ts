@@ -1,30 +1,28 @@
 import { Controller, Get, Post, Param, Body, BadRequestException } from '@nestjs/common';
 import { ProductsService } from './products.service';
-import { PrismaService } from 'src/prisma/prisma.service'; // Assurez-vous d'avoir un service Prisma configuré
+import { PrismaService } from 'src/prisma/prisma.service';
 import { Public } from 'src/common/public.decorator';
 
-@Controller('products') // Définit la route de base pour ce contrôleur
+@Controller('products')
 export class ProductsController {
   constructor(
     private readonly productsService: ProductsService,
-    private readonly prisma: PrismaService, // Service pour interagir avec la base de données
+    private readonly prisma: PrismaService,
   ) {}
 
-  // Route pour obtenir un produit par son code-barres
   @Public()
-  @Get(':barcode') // Route GET /products/:barcode
+  @Get(':barcode')
   async getProduct(@Param('barcode') barcode: string) {
     try {
       const product = await this.productsService.getProductFromOpenFoodFacts(barcode);
-      return product; // Retourner le produit trouvé
+      return product;
     } catch (error) {
       return { status: 404, message: 'Produit introuvable ou erreur avec Open Food Facts' };
     }
   }
 
-  // Route pour ajouter un produit par son code-barres
   @Public()
-  @Post() // Route POST /products
+  @Post()
   async addProduct(@Body('barcode') barcode: string) {
     if (!barcode) {
       throw new BadRequestException('Le code-barres est requis');
@@ -35,7 +33,7 @@ export class ProductsController {
       const productData = await this.productsService.getProductFromOpenFoodFacts(barcode);
 
       // Vérifier si le produit existe déjà dans la base de données
-      const existingProduct = await this.prisma.products.findUnique({
+      const existingProduct = await this.prisma.product.findUnique({
         where: { barcode: productData.barcode },
       });
 
@@ -43,8 +41,8 @@ export class ProductsController {
         return { status: 409, message: 'Le produit existe déjà dans la base de données' };
       }
 
-      // Créer le produit dans la table "products"
-      const createdProduct = await this.prisma.products.create({
+      // Créer le produit dans la table "product"
+      const createdProduct = await this.prisma.product.create({
         data: {
           name: productData.name,
           brand: productData.brand,
@@ -53,8 +51,8 @@ export class ProductsController {
         },
       });
 
-      // Créer les informations nutritionnelles dans la table "nutritional_info"
-      await this.prisma.nutritional_info.create({
+      // Créer les informations nutritionnelles dans la table "nutritionalInfo"
+      await this.prisma.nutritionalInfo.create({
         data: {
           product_id: createdProduct.id,
           energy_kcal_100g: productData.energy_kcal_100g,
@@ -74,3 +72,4 @@ export class ProductsController {
     }
   }
 }
+
