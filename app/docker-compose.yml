@@ -4,7 +4,7 @@ services:
       context: . 
       dockerfile: Dockerfile.dev  # Changer pour Dockerfile.prod en prod
     environment:
-      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_URL=${DATABASE_URL}  # S'assure que la variable d'environnement est correctement utilisée
     ports:
       - "3000:3000"
     depends_on:
@@ -13,14 +13,14 @@ services:
       - .:/usr/src/app
     networks:
       - app-network
-    command: npm run start:dev 
+    command: npm run start:dev
   
   migrations:
     build:
       context: .
       dockerfile: Dockerfile.dev
     environment:
-      - DATABASE_URL=postgresql://trinity:trinity@db:5432/trinity_dev?schema=public
+      - DATABASE_URL=postgresql://trinity:trinity@db:5432/trinity_dev?schema=public  # Connexion à la base de données dans le conteneur migrations
     depends_on:
       - db
     volumes:
@@ -28,7 +28,7 @@ services:
     networks:
       - app-network
     entrypoint: ["./scripts/migrate.sh"]  # Utilisation du script de migration
-    restart: "no"  # Conteneur temporaire, il ne redémarre pas automatiquement
+    restart: "no"
 
   db:
     image: postgres
@@ -39,7 +39,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-    - postgres_data:/var/lib/postgresql/data  
+      - postgres_data:/var/lib/postgresql/data  
     networks:
       - app-network
 
@@ -55,4 +55,4 @@ networks:
     driver: bridge
 
 volumes:
-  postgres_data: 
+  postgres_data:
