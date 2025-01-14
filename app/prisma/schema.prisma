@@ -77,21 +77,25 @@ model Price {
 
   @@map("prices")
 }
+
 model Product {
-  id          Int    @id @default(autoincrement())
-  name        String @unique
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
   brand       String
   picture     String?
   category_id Int?
-  barcode     String @unique
+  barcode     String   @unique
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   nutritionalInfo NutritionalInfo[]
+  Stock           Stock[]
+
+  @@map("products")
 }
 
 model NutritionalInfo {
-  id                 Int     @id @default(autoincrement())
+  id                 Int    @id @default(autoincrement())
   product_id         Int
   energy_kcal_100g   Float?
   sugars_100g        Float?
@@ -102,6 +106,18 @@ model NutritionalInfo {
   fiber_100g         Float?
 
   product Product @relation(fields: [product_id], references: [id])
+
+  @@map("nutritional_infos")
 }
 
+model Stock {
+  id        Int      @id @default(autoincrement()) // La clé primaire est id
+  productId Int      @unique // Assurez-vous que productId est unique
+  quantity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
+  product   Product  @relation(fields: [productId], references: [id])
+
+  @@map("stocks")
+}

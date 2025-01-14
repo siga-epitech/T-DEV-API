@@ -7,9 +7,11 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { PricesModule } from './prices/prices.module';
 import { ProductsModule } from './products/products.module';
+import { StockModule } from './stock/stock.module';
+
 
 @Module({
-  imports: [UsersModule, AuthModule, PricesModule, ProductsModule],
+  imports: [UsersModule, AuthModule, PricesModule, ProductsModule,StockModule],
   controllers: [AppController],
   providers: [
     AppService,

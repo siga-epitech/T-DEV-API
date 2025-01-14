@@ -1,5 +1,5 @@
--- CreateTable
-CREATE TABLE "Product" (
+-- CreateTable: Products
+CREATE TABLE "products" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "brand" TEXT NOT NULL,
@@ -8,12 +8,11 @@ CREATE TABLE "Product" (
     "barcode" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "Product_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "products_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
-CREATE TABLE "NutritionalInfo" (
+-- CreateTable: Nutritional Infos
+CREATE TABLE "nutritional_infos" (
     "id" SERIAL NOT NULL,
     "product_id" INTEGER NOT NULL,
     "energy_kcal_100g" DOUBLE PRECISION,
@@ -23,15 +22,10 @@ CREATE TABLE "NutritionalInfo" (
     "carbohydrates_100g" DOUBLE PRECISION,
     "salt_100g" DOUBLE PRECISION,
     "fiber_100g" DOUBLE PRECISION,
-
-    CONSTRAINT "NutritionalInfo_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "nutritional_infos_pkey" PRIMARY KEY ("id"),
+    CONSTRAINT "nutritional_infos_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "products"("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
--- CreateIndex
-CREATE UNIQUE INDEX "Product_name_key" ON "Product"("name");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Product_barcode_key" ON "Product"("barcode");
-
--- AddForeignKey
-ALTER TABLE "NutritionalInfo" ADD CONSTRAINT "NutritionalInfo_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+-- CreateIndex: Unique constraints on Products
+CREATE UNIQUE INDEX "products_name_key" ON "products" ("name");
+CREATE UNIQUE INDEX "products_barcode_key" ON "products" ("barcode");
