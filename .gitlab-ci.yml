@@ -1,189 +1,47 @@
 stages:
-  - clone
-  - build
-  - test
-  - deploy
+  - trigger_devops_pipeline
+  - trigger_dev
+  - trigger_prod
+
+# Trigger le pipeline dans le projet DevOps (Dev)
+trigger_devops_dev:
+  stage: trigger_dev
+  trigger:
+    project: "MAR_18/T-DEV-701-Devops"
+    branch: "dev"
+  variables:
+    ENVIRONMENT: "dev"
+  only:
+    - dev
+
+# Trigger le pipeline dans le projet DevOps (Prod)
+trigger_devops_prod:
+  stage: trigger_prod
+  trigger:
+    project: "MAR_18/T-DEV-701-Devops"
+    branch: "prod"
+  variables:
+    ENVIRONMENT: "prod"
+  only:
+    - prod
+
+# Trigger le pipeline dans le projet DevOps pour une feature spécifique // test
+trigger_devops_pipelines:
+  stage: trigger_devops_pipeline
+  trigger:
+    project: "MAR_18/T-DEV-701-Devops"
+    branch: "main"
+  variables:
+    ENVIRONMENT: "prod"
+    ENV: "prod"
+    REPO: "api"
+  only:
+    - feature/ci-config
+    - main
+
+# Launcher la
+
+    
 
 
-before_script:
-  - echo "Cleaning npm cache"
-  - npm cache clean --force
 
-# Variables de configuration
-variables:
-  API_REPO_URL: "t-dev.epitest.eu/MAR_18/T-DEV-702-Api.git"
-  MOBILE_REPO_URL: "t-dev.epitest.eu/MAR_18/T-DEV-703-Mobile.git"
-  
-  REPO: "api"
-
-  DOCKER_IMAGE_NAME_API: "t-dev-702-api"
-  DOCKER_IMAGE_NAME_MOBILE: "t-dev-703-mobile"
-  API_BRANCH: "feature/ci-config"  # à configurer plus tard
-  MOBILE_BRANCH: "feature/ci-config"  # à configurer plus tard
-  ENV: "prod"  # à configurer selon le contexte (dev, prod) dans le trigger master
-
-# Étape de clonage des dépôts
-clone_repos:
-  stage: clone
-  tags:
-    - sigaRunner
-  script:
-    - echo "Determining the repository and branch to clone..."
-    - if [ -d "app" ]; then rm -rf app; fi
-    - |
-      if [ "$REPO" == "api" ]; then
-        export CLONE_URL="https://anthony.guarneri:${PERSONAL_ACCESS_TOKEN}@${API_REPO_URL}"
-        if [ "$ENV" == "dev" ]; then
-          export CLONE_BRANCH="dev"
-        elif [ "$ENV" == "prod" ]; then
-          export CLONE_BRANCH="feature/ci-config"  
-        else
-          echo "Invalid environment specified for API. Exiting."
-          exit 1
-        fi
-      elif [ "$REPO" == "mobile" ]; then
-        export CLONE_URL="https://anthony.guarneri:${PERSONAL_ACCESS_TOKEN}@${MOBILE_REPO_URL}"
-        if [ "$ENV" == "dev" ]; then
-          export CLONE_BRANCH="dev"
-        elif [ "$ENV" == "prod" ]; then
-          export CLONE_BRANCH="prod"
-        else
-          echo "Invalid environment specified for Mobile. Exiting."
-          exit 1
-        fi
-      else
-        echo "No valid repository specified. Exiting."
-        exit 1
-      fi
-    - echo "Cloning from $CLONE_URL on branch $CLONE_BRANCH..."
-    - git clone --branch $CLONE_BRANCH $CLONE_URL app
-    - echo "Listing files in the current directory:"
-    - ls -l
-    - echo "Listing files in the cloned repository directory:"
-    - ls -l app
-  artifacts:
-    paths:
-      - app
-
-  
-
-# Build API ou Mobile en fonction de l'environnement
-build_api_or_mobile:
-  stage: build
-  needs:
-    - clone_repos
-  tags:
-    - sigaRunner
-  script:
-    - |
-      if [ "$REPO" == "api" ]; then
-        if [ "$ENV" == "dev" ]; then
-          echo "Building Docker image for the API in dev environment..."
-          docker build -t ${DOCKER_IMAGE_NAME_API}:dev -f app/api/Dockerfile.dev app/api/
-        elif [ "$ENV" == "prod" ]; then
-          echo "Building Docker image for the API in prod environment..."
-          docker build -t ${DOCKER_IMAGE_NAME_API}:prod -f app/api/Dockerfile.prod app/api/
-        else
-          echo "Unknown environment for API, exiting..."
-          exit 1
-        fi
-      elif [ "$REPO" == "mobile" ]; then
-        if [ "$ENV" == "dev" ]; then
-          echo "Building Docker image for the Mobile in dev environment..."
-          docker build -t ${DOCKER_IMAGE_NAME_MOBILE}:dev -f mobile/Dockerfile.dev mobile/
-        elif [ "$ENV" == "prod" ]; then
-          echo "Building Docker image for the Mobile in prod environment..."
-          docker build -t ${DOCKER_IMAGE_NAME_MOBILE}:prod -f mobile/Dockerfile.prod mobile/
-        else
-          echo "Unknown environment for Mobile, exiting..."
-          exit 1
-        fi
-      else
-        echo "Unknown repository, exiting..."
-        exit 1
-      fi
-  rules:
-    - if: '$ENV == "dev" || $ENV == "prod"'
-
-
-# Tests pour l'API
-test_api:
-  stage: test
-  needs:
-    - build_api_or_mobile
-  tags:
-    - sigaRunner
-  script:
-    - echo "Running tests for the API..."
-    - docker run --rm ${DOCKER_IMAGE_NAME_API}:${ENV} npm test
-  rules:
-    - if: '($REPO == "api") && ($ENV == "prod")'
-
-# Tests pour le Mobile
-test_mobile:
-  stage: test
-  needs:
-    - build_api_or_mobile
-  tags:
-    - sigaRunner
-  script:
-    - echo "Running tests for the Mobile..."
-    - docker run --rm ${DOCKER_IMAGE_NAME_MOBILE}:${ENV} npm test
-  rules:
-    - if: '($REPO == "mobile") && ($ENV == "prod")'
-
-## Déploiement en développement pour l'API
-deploy_api_dev:
-  stage: deploy
-  needs:
-    - test_api
-  tags:
-    - sigaRunner
-  script:
-    - echo "Deploying API to development..."
-    - docker run -d --name ${DOCKER_IMAGE_NAME_API}_dev -p 3000:3000 ${DOCKER_IMAGE_NAME_API}:dev
-    - echo "API is deployed to development."
-  rules:
-    - if: '$ENV == "dev" && $REPO == "api"'
-
-# Déploiement en développement pour le Mobile
-deploy_mobile_dev:
-  stage: deploy
-  needs:
-    - test_mobile
-  tags:
-    - sigaRunner
-  script:
-    - echo "Deploying Mobile to development..."
-    - docker run -d --name ${DOCKER_IMAGE_NAME_MOBILE}_dev -p 4000:4000 ${DOCKER_IMAGE_NAME_MOBILE}:dev
-    - echo "Mobile app is deployed to development."
-  rules:
-    - if: '$ENV == "dev" && $REPO == "mobile"'
-
-# Déploiement en production pour l'API
-deploy_api_prod:
-  stage: deploy
-  needs:
-    - test_api
-  tags:
-    - sigaRunner
-  script:
-    - echo "Deploying API to production..."
-    - docker run -d --name ${DOCKER_IMAGE_NAME_API}_prod -p 3000:3000 ${DOCKER_IMAGE_NAME_API}:prod
-    - echo "API is deployed to production."
-  rules:
-    - if: '$ENV == "prod" && $REPO == "api"'
-
-# Déploiement en production pour le Mobile
-deploy_mobile_prod:
-  stage: deploy
-  needs:
-    - test_mobile
-  tags:
-    - sigaRunner
-  script:
-    - echo "Deploying Mobile to production..."
-    - docker run -d --name ${DOCKER_IMAGE_NAME_MOBILE}_prod -p 4000:4000 ${DOCKER_IMAGE_NAME_MOBILE}:prod
-    - echo "Mobile app is deployed to production."
-  rules:
-    - if: '$ENV == "prod" && $REPO == "mobile"'
