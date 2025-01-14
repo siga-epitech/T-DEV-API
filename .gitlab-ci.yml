@@ -36,6 +36,7 @@ trigger_devops_pipelines:
     ENV: "prod"
     REPO: "api"
   only:
+    - hotfix/develop
     - feature/ci-config
     - main
 
