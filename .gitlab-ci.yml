@@ -34,7 +34,7 @@ trigger_devops_pipelines:
   variables:
     ENVIRONMENT: "prod"
     ENV: "prod"
-    REPO: "api"
+    REPO: $CI_COMMIT_REF_NAME
   only:
     - hotfix/develop
     - feature/ci-config
