@@ -33,7 +33,7 @@ trigger_devops_pipelines:
     branch: "main"
   variables:
     ENVIRONMENT: "dev"
-    ENV: "dev"
+    ENV: "dev"      
   only:
     - hotfix/develop
     - feature/ci-config
