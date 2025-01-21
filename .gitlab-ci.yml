@@ -30,14 +30,14 @@ trigger_devops_pipelines:
   stage: trigger_devops_pipeline
   trigger:
     project: "MAR_18/T-DEV-701-Devops"
-    branch: "feature/ci-config"
+    branch: "feature/ci-config" # METTRE LA BRANCH MAIN APRES AVOIR MERGE LA FEATURE -> MAIN
   variables:
     REPO_NAME: "api"
     ENV: "dev"
   only:
     - hotfix/develop
     - feature/ci-config
-    - main
+    - main  
 
 # Launcher la ici 
 
