@@ -32,10 +32,11 @@ trigger_devops_pipelines:
     project: "MAR_18/T-DEV-701-Devops"
     branch: "main"
   variables:
-    ENVIRONMENT: "prod"
-    ENV: "prod"
+    ENVIRONMENT: "dev"
+    ENV: "dev"
     REPO: "api"
   only:
+    - hotfix/develop
     - feature/ci-config
     - main
 
