@@ -30,7 +30,7 @@ trigger_devops_pipelines:
   stage: trigger_devops_pipeline
   trigger:
     project: "MAR_18/T-DEV-701-Devops"
-    branch: "main"
+    branch: "feature/ci-config"
   variables:
     ENVIRONMENT: "dev"
     ENV: "dev"
@@ -38,7 +38,7 @@ trigger_devops_pipelines:
     - hotfix/develop
     - feature/ci-config
     - main
-    - tata
+    - tonton
 
 # Launcher la ici 
 
