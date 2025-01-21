@@ -37,7 +37,7 @@ trigger_devops_pipelines:
   only:
     - hotfix/develop
     - feature/ci-config
-    - main
+    - main  
 
 # Launcher la ici 
 
